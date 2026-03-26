@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grand River Digital &mdash; Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f3f4f6;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{background:#fff;border:1px solid rgba(0,0,0,.09);border-radius:16px;padding:44px 40px;width:100%;max-width:380px;box-shadow:0 4px 32px rgba(0,0,0,.08)}
+.logo-wrap{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.logo-mark{width:34px;height:34px;background:#1a56db;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.logo-mark svg{width:18px;height:18px;fill:#fff}
+.logo-text{font-size:15px;font-weight:700;letter-spacing:-.2px;color:#111827}
+.logo-text span{color:#1a56db}
+.sub{font-size:12.5px;color:#6b7280;margin-bottom:28px;margin-top:6px;line-height:1.5;padding-left:44px}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+label{font-size:11px;font-weight:600;color:#6b7280;letter-spacing:.3px;text-transform:uppercase}
+input[type=password]{padding:11px 14px;border:1px solid #e5e7eb;border-radius:9px;font-size:14px;outline:none;transition:border .15s,box-shadow .15s;width:100%;font-family:inherit;color:#111827}
+input[type=password]:focus{border-color:#1a56db;box-shadow:0 0 0 3px rgba(26,86,219,.12)}
+.btn{width:100%;padding:12px;background:#1a56db;color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s;margin-top:6px;letter-spacing:-.1px}
+.btn:hover{background:#1d4ed8}
+.err{font-size:12px;color:#dc2626;margin-top:10px;display:none;padding:9px 12px;background:rgba(220,38,38,.06);border-radius:7px;border:1px solid rgba(220,38,38,.15)}
+.divider{border:none;border-top:1px solid #f3f4f6;margin:20px 0}
+.hint{font-size:11px;color:#9ca3af;text-align:center;line-height:1.6}
+.accent-dot{display:inline-block;width:6px;height:6px;background:#f59e0b;border-radius:50%;margin-right:5px;vertical-align:middle}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-wrap">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    </div>
+    <div class="logo-text">Grand River <span>Digital</span></div>
+  </div>
+  <div class="sub">Agency Dashboard &mdash; owner access only</div>
+  <div class="field">
+    <label for="pw">Access Password</label>
+    <input type="password" id="pw" placeholder="Enter your password"
+      autofocus onkeydown="if(event.key==='Enter')doLogin()">
+  </div>
+  <button class="btn" onclick="doLogin()">Enter Dashboard &rarr;</button>
+  <div class="err" id="err">Incorrect password &mdash; please try again.</div>
+  <hr class="divider">
+  <div class="hint">
+    <span class="accent-dot"></span>This page is not linked anywhere on the public site.<br>
+    Bookmark it after your first successful login.
+  </div>
+</div>
+<script>
+const H='18bbbec8bd46ee18b107b185aaea73ef6e0c8e7db524f821d1b3c96d51c8a03a';
+async function doLogin(){
+  const pw=document.getElementById('pw').value;
+  if(!pw)return;
+  const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pw));
+  const h=Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
+  if(h===H){sessionStorage.setItem('grd_admin',h);window.location.href='dashboard.html';}
+  else{const e=document.getElementById('err');e.style.display='block';document.getElementById('pw').value='';document.getElementById('pw').focus();setTimeout(()=>e.style.display='none',3000);}
+}
+(async()=>{const s=sessionStorage.getItem('grd_admin');if(s&&s===H)window.location.href='dashboard.html';})();
+</script>
+</body>
+</html>

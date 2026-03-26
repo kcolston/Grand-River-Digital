@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grand River Digital — Business Workflow</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f5f4f1;--surface:#fff;--surface2:#f0efe9;--surface3:#e8e7e0;
+  --border:rgba(0,0,0,0.07);--border2:rgba(0,0,0,0.13);
+  --text:#18181a;--muted:#6b6b6a;--hint:#a0a09a;
+  --accent:#1a56db;--green:#15803d;--amber:#d97706;--red:#dc2626;--blue:#2563eb;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6}
+
+/* NAV */
+.topnav{position:fixed;top:0;left:0;right:0;height:54px;background:rgba(245,244,241,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:100}
+.topnav-logo{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:1.5px;color:var(--text)}
+.topnav-logo span{color:var(--accent)}
+.topnav-links{display:flex;gap:4px;margin-left:auto}
+.topnav-link{padding:5px 12px;border-radius:6px;font-size:12px;color:var(--muted);text-decoration:none;transition:all .15s;border:none;background:none;cursor:pointer;font-family:var(--font)}
+.topnav-link:hover,.topnav-link.active{background:var(--surface);color:var(--text)}
+.topnav-link.active{font-weight:500}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh;padding-top:54px}
+
+/* SIDEBAR */
+.sidebar{position:fixed;top:54px;left:0;bottom:0;width:220px;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:16px 10px}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+.sb-phase{margin-bottom:4px}
+.sb-phase-label{font-size:9px;color:var(--hint);font-weight:500;letter-spacing:.8px;text-transform:uppercase;padding:8px 8px 3px}
+.sb-step{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;cursor:pointer;text-decoration:none;color:var(--muted);font-size:12px;transition:all .12s;border:none;background:none;width:100%;text-align:left;font-family:var(--font)}
+.sb-step:hover{background:var(--surface2);color:var(--text)}
+.sb-step.active{background:rgba(26,86,219,.1);color:var(--accent);font-weight:500}
+.sb-step-num{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0;font-family:var(--mono)}
+
+/* MAIN */
+.main{margin-left:220px;padding:32px 40px 80px}
+
+/* PHASE HEADER */
+.phase-header{margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.phase-eyebrow{font-size:11px;font-family:var(--mono);color:var(--accent);letter-spacing:.6px;margin-bottom:6px}
+.phase-title{font-size:26px;font-weight:500;letter-spacing:-.3px;margin-bottom:8px}
+.phase-sub{font-size:14px;color:var(--muted);max-width:580px;line-height:1.65}
+
+/* STEP CARD */
+.step-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden;scroll-margin-top:80px}
+.step-header{display:flex;align-items:flex-start;gap:14px;padding:18px 20px;cursor:pointer;user-select:none}
+.step-header:hover{background:rgba(0,0,0,.015)}
+.step-num{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;font-family:var(--mono);flex-shrink:0}
+.step-info{flex:1}
+.step-title{font-size:14px;font-weight:500;margin-bottom:3px}
+.step-preview{font-size:12px;color:var(--muted)}
+.step-meta{display:flex;gap:6px;align-items:center;margin-left:auto;flex-shrink:0}
+.tag{display:inline-flex;align-items:center;padding:3px 9px;border-radius:99px;font-size:10px;font-weight:500}
+.tag-green{background:rgba(21,128,61,.1);color:var(--green)}
+.tag-blue{background:rgba(37,99,235,.1);color:var(--blue)}
+.tag-amber{background:rgba(217,119,6,.1);color:var(--amber)}
+.tag-purple{background:rgba(26,86,219,.1);color:var(--accent)}
+.tag-gray{background:var(--surface2);color:var(--muted)}
+.chevron{font-size:11px;color:var(--hint);transition:transform .2s;margin-left:6px}
+.step-card.open .chevron{transform:rotate(180deg)}
+.step-body{display:none;padding:0 20px 20px;border-top:1px solid var(--border)}
+.step-card.open .step-body{display:block}
+
+/* STEP BODY CONTENT */
+.step-section{margin-top:16px}
+.step-section-title{font-size:10px;font-weight:500;color:var(--hint);letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px}
+.step-desc{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:12px}
+
+/* ACTION LIST */
+.action-list{display:flex;flex-direction:column;gap:6px}
+.action-item{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;background:var(--surface2);border-radius:8px;font-size:12.5px;line-height:1.5}
+.action-check{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--border2);flex-shrink:0;cursor:pointer;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--surface)}
+.action-check.done{background:var(--green);border-color:var(--green);color:#fff}
+.action-text{flex:1;color:var(--text)}
+.action-text.done{text-decoration:line-through;color:var(--muted)}
+
+/* TOOL PILLS */
+.tool-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tool-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;background:var(--surface);border:1px solid var(--border2);border-radius:6px;font-size:11px;font-weight:500;color:var(--text)}
+.tool-pill-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+
+/* TIMELINE */
+.timeline{display:flex;align-items:center;gap:0;margin:12px 0;overflow-x:auto;padding-bottom:4px}
+.tl-item{display:flex;flex-direction:column;align-items:center;min-width:80px}
+.tl-dot{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;font-family:var(--mono);z-index:1}
+.tl-line{flex:1;height:2px;background:var(--border2);margin:0}
+.tl-label{font-size:9px;color:var(--muted);margin-top:4px;text-align:center;line-height:1.3}
+.tl-wrap{display:flex;align-items:center;width:100%}
+
+/* SCRIPT BOX */
+.script-box{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:12px;color:var(--muted);line-height:1.75;font-family:var(--mono);white-space:pre-line;margin-top:8px;position:relative}
+.copy-btn{position:absolute;top:8px;right:8px;padding:3px 9px;background:var(--surface);border:1px solid var(--border2);border-radius:5px;font-size:10px;cursor:pointer;font-family:var(--font);color:var(--muted);transition:all .12s}
+.copy-btn:hover{color:var(--text);border-color:var(--accent)}
+
+/* PROGRESS */
+.progress-bar{position:fixed;top:54px;left:0;right:0;height:3px;background:var(--border);z-index:99}
+.progress-fill{height:100%;background:var(--accent);transition:width .3s ease;width:0%}
+
+/* PHASE TABS */
+.phase-tabs{display:flex;gap:6px;margin-bottom:28px;flex-wrap:wrap}
+.phase-tab{padding:8px 16px;border-radius:8px;font-size:12.5px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--surface);color:var(--muted);transition:all .15s;display:flex;align-items:center;gap:7px}
+.phase-tab:hover{border-color:var(--accent);color:var(--accent)}
+.phase-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.phase-tab-num{font-size:10px;font-family:var(--mono);opacity:.7}
+
+/* INFO BOX */
+.info-box{border-left:3px solid var(--accent);background:rgba(26,86,219,.05);border-radius:0 8px 8px 0;padding:11px 14px;font-size:12.5px;color:var(--muted);line-height:1.6;margin-top:10px}
+.warn-box{border-left:3px solid var(--amber);background:rgba(217,119,6,.05);border-radius:0 8px 8px 0;padding:11px 14px;font-size:12.5px;color:var(--muted);line-height:1.6;margin-top:10px}
+
+/* 2-col grid */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+
+/* OVERVIEW MAP */
+.flow-map{display:flex;flex-direction:column;gap:0}
+.flow-phase{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px}
+.flow-phase-header{padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.flow-phase-title{font-size:13px;font-weight:500;flex:1}
+.flow-phase-steps{padding:0 16px 12px;display:flex;flex-wrap:wrap;gap:6px}
+.flow-step-pill{padding:4px 10px;border-radius:5px;font-size:11px;border:1px solid var(--border2);background:var(--surface2);color:var(--muted);cursor:pointer;transition:all .12s}
+.flow-step-pill:hover{border-color:var(--accent);color:var(--accent)}
+
+/* PRINT */
+@media print {
+  .topnav,.sidebar,.progress-bar{display:none}
+  .layout{grid-template-columns:1fr}
+  .main{margin-left:0;padding:20px}
+  .step-body{display:block!important}
+}
+@media (max-width:768px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .main{margin-left:0;padding:16px 16px 60px}
+  .two-col{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<nav class="topnav">
+  <div class="topnav-logo">GRAND RIVER <span>DIGITAL</span> · Workflow</div>
+  <div class="topnav-links">
+    <button class="topnav-link active" onclick="showPhase('all',this)">All phases</button>
+    <button class="topnav-link" onclick="showPhase('1',this)">1. Signup</button>
+    <button class="topnav-link" onclick="showPhase('2',this)">2. Onboarding</button>
+    <button class="topnav-link" onclick="showPhase('3',this)">3. Build</button>
+    <button class="topnav-link" onclick="showPhase('4',this)">4. Launch</button>
+    <button class="topnav-link" onclick="showPhase('5',this)">5. Retain</button>
+  </div>
+</nav>
+
+<div class="layout">
+<aside class="sidebar">
+  <div class="sb-phase">
+    <div class="sb-phase-label">Phase 1 · Signup</div>
+    <a class="sb-step" href="#s1" onclick="openStep('s1')"><div class="sb-step-num" style="background:rgba(26,86,219,.1);color:var(--accent)">01</div>Lead submits form</a>
+    <a class="sb-step" href="#s2" onclick="openStep('s2')"><div class="sb-step-num" style="background:rgba(26,86,219,.1);color:var(--accent)">02</div>You get notified</a>
+    <a class="sb-step" href="#s3" onclick="openStep('s3')"><div class="sb-step-num" style="background:rgba(26,86,219,.1);color:var(--accent)">03</div>First contact call</a>
+  </div>
+  <div class="sb-phase">
+    <div class="sb-phase-label">Phase 2 · Onboarding</div>
+    <a class="sb-step" href="#s4" onclick="openStep('s4')"><div class="sb-step-num" style="background:rgba(21,128,61,.1);color:var(--green)">04</div>Send proposal</a>
+    <a class="sb-step" href="#s5" onclick="openStep('s5')"><div class="sb-step-num" style="background:rgba(21,128,61,.1);color:var(--green)">05</div>Contract & payment</a>
+    <a class="sb-step" href="#s6" onclick="openStep('s6')"><div class="sb-step-num" style="background:rgba(21,128,61,.1);color:var(--green)">06</div>Intake questionnaire</a>
+  </div>
+  <div class="sb-phase">
+    <div class="sb-phase-label">Phase 3 · Build</div>
+    <a class="sb-step" href="#s7" onclick="openStep('s7')"><div class="sb-step-num" style="background:rgba(37,99,235,.1);color:var(--blue)">07</div>Set up tools</a>
+    <a class="sb-step" href="#s8" onclick="openStep('s8')"><div class="sb-step-num" style="background:rgba(37,99,235,.1);color:var(--blue)">08</div>Build the site</div></a>
+    <a class="sb-step" href="#s9" onclick="openStep('s9')"><div class="sb-step-num" style="background:rgba(37,99,235,.1);color:var(--blue)">09</div>Client review</a>
+    <a class="sb-step" href="#s10" onclick="openStep('s10')"><div class="sb-step-num" style="background:rgba(37,99,235,.1);color:var(--blue)">10</div>Revisions</a>
+  </div>
+  <div class="sb-phase">
+    <div class="sb-phase-label">Phase 4 · Launch</div>
+    <a class="sb-step" href="#s11" onclick="openStep('s11')"><div class="sb-step-num" style="background:rgba(217,119,6,.1);color:var(--amber)">11</div>Pre-launch checks</a>
+    <a class="sb-step" href="#s12" onclick="openStep('s12')"><div class="sb-step-num" style="background:rgba(217,119,6,.1);color:var(--amber)">12</div>Go live</a>
+    <a class="sb-step" href="#s13" onclick="openStep('s13')"><div class="sb-step-num" style="background:rgba(217,119,6,.1);color:var(--amber)">13</div>Post-launch setup</a>
+  </div>
+  <div class="sb-phase">
+    <div class="sb-phase-label">Phase 5 · Retain</div>
+    <a class="sb-step" href="#s14" onclick="openStep('s14')"><div class="sb-step-num" style="background:rgba(220,38,38,.1);color:var(--red)">14</div>Monthly maintenance</a>
+    <a class="sb-step" href="#s15" onclick="openStep('s15')"><div class="sb-step-num" style="background:rgba(220,38,38,.1);color:var(--red)">15</div>Monthly SEO report</a>
+    <a class="sb-step" href="#s16" onclick="openStep('s16')"><div class="sb-step-num" style="background:rgba(220,38,38,.1);color:var(--red)">16</div>Upsell & upgrade</a>
+  </div>
+</aside>
+
+<main class="main">
+
+<!-- PHASE 1 -->
+<div class="phase-section" data-phase="1">
+<div class="phase-header">
+  <div class="phase-eyebrow">Phase 1</div>
+  <div class="phase-title">Customer Signup</div>
+  <div class="phase-sub">From the moment a business discovers you to your first real conversation. Your goal is to respond fast — studies show contacting a lead within 5 minutes of form submission is 21x more effective.</div>
+</div>
+
+<div class="step-card open" id="s1">
+  <div class="step-header" onclick="toggleStep('s1')">
+    <div class="step-num" style="background:rgba(26,86,219,.1);color:var(--accent)">01</div>
+    <div class="step-info">
+      <div class="step-title">Lead submits the landing page form</div>
+      <div class="step-preview">grandriverdigital-landing.html → auto-saves to your dashboard</div>
+    </div>
+    <div class="step-meta"><span class="tag tag-purple">Automated</span><span class="chevron">▼</span></div>
+  </div>
+  <div class="step-body">
+    <div class="step-desc">When someone fills out the "Request your free mockup" form on your landing page, their info is automatically saved to localStorage and pushed into your dashboard as a new client record. You don't have to do anything manually.</div>
+    <div class="step-section">
+      <div class="step-section-title">What gets captured</div>
+      <div class="action-list">
+        <div class="action-item"><div class="action-text">First + last name and business name</div></div>
+        <div class="action-item"><div class="action-text">Phone number (required) and email</div></div>
+        <div class="action-item"><div class="action-text">Business type / industry</div></div>
+        <div class="action-item"><div class="action-text">Which plan they're interested in (Starter / Growth / Pro)</div></div>
+        <div class="action-item"><div class="action-text">Any notes they left about their business</div></div>
+      </div>
+    </div>
+    <div class="step-section">
+      <div class="step-section-title">Tools</div>
+      <div class="tool-row">
+        <div class="tool-pill"><div class="tool-pill-dot" style="background:var(--accent)"></div>Landing Page Form</div>
+        <div class="tool-pill"><div class="tool-pill-dot" style="background:var(--green)"></div>Grand River Digital Dashboard</div>
+      </div>
+    </div>
+    <div class="info-box">Your dashboard will show a green "New signup from landing page" banner the next time you open it. New clients appear at the top of your client list with a green dot.</div>
+  </div>
+</div>
+
+<div class="step-card" id="s2">
+  <div class="step-header" onclick="toggleStep('s2')">
+    <div class="step-num" style="background:rgba(26,86,219,.1);color:var(--accent)">02</div>
+    <div class="step-info">
+      <div class="step-title">You get notified — check your dashboard</div>
+      <div class="step-preview">Open grandriverdigital-dashboard.html → review new signup</div>
+    </div>
+    <div class="step-meta"><span class="tag tag-gray">Manual</span><span class="chevron">▼</span></div>
+  </div>
+  <div class="step-body">
+    <div class="step-desc">Make it a habit to check your dashboard every morning. When you see a new signup, review their details before calling — know their business name, type, and which plan they selected.</div>
+    <div class="step-section">
+      <div class="step-section-title">Your checklist</div>
+      <div class="action-list" id="s2-checks">
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Open grandriverdigital-dashboard.html and check for the green banner</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Click into the new client record — read their name, business type, and notes</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Look up their business on Google Maps to see their current online presence</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Note their plan interest and prepare a rough talking point about it</div></div>
+      </div>
+    </div>
+    <div class="warn-box">Aim to call within 30 minutes of the form submission. The lead is hot — they just asked for help and they're thinking about their website right now.</div>
+  </div>
+</div>
+
+<div class="step-card" id="s3">
+  <div class="step-header" onclick="toggleStep('s3')">
+    <div class="step-num" style="background:rgba(26,86,219,.1);color:var(--accent)">03</div>
+    <div class="step-info">
+      <div class="step-title">First contact call (10 minutes)</div>
+      <div class="step-preview">Goal: qualify, build trust, book a follow-up</div>
+    </div>
+    <div class="step-meta"><span class="tag tag-gray">Manual</span><span class="chevron">▼</span></div>
+  </div>
+  <div class="step-body">
+    <div class="step-desc">This call has one goal: make them feel heard and book a next step. Don't pitch. Don't sell. Just ask questions, show you've done your homework, and end with a clear next action.</div>
+    <div class="step-section">
+      <div class="step-section-title">Call script</div>
+      <div class="script-box" id="script-s3">Hi [Name], this is [Your Name] from Grand River Digital. I saw your request come in for [Business Name] — thanks for reaching out!
+
+I just took a quick look at your Google Maps listing and I can see you've got some great reviews. I'd love to help turn that into a full online presence.
+
+I have just a couple of quick questions so I can put together the right mockup for you:
+
+1. What do most of your customers ask when they first find you? (Understand their needs)
+2. Do you have any photos of your work or business I could use?
+3. Is there a competitor in your area whose website you like the look of?
+
+Great — based on what you're describing, I think the [Starter/Growth/Pro] plan would be a great fit. I'm going to put together a free mockup this week. Can I send that over to your email on [day]?
+
+Perfect. I'll have something to show you by [date]. Talk soon!<button class="copy-btn" onclick="copyScript('script-s3')">Copy</button></div>
+    </div>
+    <div class="step-section">
+      <div class="step-section-title">Checklist</div>
+      <div class="action-list">
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Call within 30 minutes of form submission if possible</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Ask about their business, customers, and goals — don't just talk about your services</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Commit to sending a mockup by a specific date</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Log notes in HubSpot CRM immediately after the call</div></div>
+      </div>
+    </div>
+    <div class="step-section">
+      <div class="step-section-title">Tools</div>
+      <div class="tool-row">
+        <div class="tool-pill"><div class="tool-pill-dot" style="background:var(--orange,#ea580c)"></div>HubSpot CRM (free)</div>
+        <div class="tool-pill"><div class="tool-pill-dot" style="background:var(--blue)"></div>Your phone</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 2 -->
+<div class="phase-section" data-phase="2">
+<div class="phase-header" style="margin-top:32px">
+  <div class="phase-eyebrow">Phase 2</div>
+  <div class="phase-title">Client Onboarding</div>
+  <div class="phase-sub">Getting the paperwork and payment sorted before you touch a single pixel. Never start building without a signed contract and first payment received.</div>
+</div>
+
+<div class="step-card" id="s4">
+  <div class="step-header" onclick="toggleStep('s4')">
+    <div class="step-num" style="background:rgba(21,128,61,.1);color:var(--green)">04</div>
+    <div class="step-info">
+      <div class="step-title">Send the proposal</div>
+      <div class="step-preview">HoneyBook → one link with pricing, scope, and contract</div>
+    </div>
+    <div class="step-meta"><span class="tag tag-gray">Manual · 15 min</span><span class="chevron">▼</span></div>
+  </div>
+  <div class="step-body">
+    <div class="step-desc">In HoneyBook, create a proposal from your template. Customize the client name, business type, and which plan they discussed. The proposal includes your pricing, what's included, and a timeline — all in one professional document.</div>
+    <div class="step-section">
+      <div class="step-section-title">What to include in the proposal</div>
+      <div class="two-col">
+        <div>
+          <div class="step-section-title" style="margin-top:0">Scope of work</div>
+          <div class="action-list">
+            <div class="action-item"><div class="action-text">Number of pages included</div></div>
+            <div class="action-item"><div class="action-text">Services (hosting, maintenance, SEO)</div></div>
+            <div class="action-item"><div class="action-text">What's NOT included (e.g., copywriting)</div></div>
+            <div class="action-item"><div class="action-text">Revision rounds allowed (recommend: 2)</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="step-section-title" style="margin-top:0">Pricing & timeline</div>
+          <div class="action-list">
+            <div class="action-item"><div class="action-text">Monthly plan price (Starter/Growth/Pro)</div></div>
+            <div class="action-item"><div class="action-text">First month billed on signing</div></div>
+            <div class="action-item"><div class="action-text">Site delivery timeline (48–72 hrs for mockup)</div></div>
+            <div class="action-item"><div class="action-text">30-day notice cancellation policy</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="step-section">
+      <div class="step-section-title">Tools</div>
+      <div class="tool-row">
+        <div class="tool-pill"><div class="tool-pill-dot" style="background:#f59e0b"></div>HoneyBook</div>
+      </div>
+    </div>
+    <div class="info-box">Send the proposal within 24 hours of your call while you're still fresh in their mind. Follow up with a Loom video walking them through it — this dramatically increases conversion.</div>
+  </div>
+</div>
+
+<div class="step-card" id="s5">
+  <div class="step-header" onclick="toggleStep('s5')">
+    <div class="step-num" style="background:rgba(21,128,61,.1);color:var(--green)">05</div>
+    <div class="step-info">
+      <div class="step-title">Contract signed & first payment received</div>
+      <div class="step-preview">HoneyBook handles e-signature + Stripe payment in one step</div>
+    </div>
+    <div class="step-meta"><span class="tag tag-green">Automated</span><span class="chevron">▼</span></div>
+  </div>
+  <div class="step-body">
+    <div class="step-desc">Your HoneyBook proposal includes a contract and payment link. The client signs digitally and pays their first month — all in one flow. You receive email confirmation. Do not start building until both are done.</div>
+    <div class="step-section">
+      <div class="step-section-title">Key contract clauses to always include</div>
+      <div class="action-list">
+        <div class="action-item"><div class="action-text">Payment is due on the 1st of each month, auto-charged</div></div>
+        <div class="action-item"><div class="action-text">30-day written notice required to cancel</div></div>
+        <div class="action-item"><div class="action-text">Client is responsible for providing content (text, photos) within 5 business days</div></div>
+        <div class="action-item"><div class="action-text">You retain the right to pause work if payment is 7+ days overdue</div></div>
+        <div class="action-item"><div class="action-text">Ownership of site transfers to client only if they move off your hosting</div></div>
+      </div>
+    </div>
+    <div class="step-section">
+      <div class="step-section-title">After signing</div>
+      <div class="action-list">
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Confirm receipt via email: "Got it! Let's build your site."</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Update client status in your dashboard to Active</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Set up recurring billing in HoneyBook / Stripe</div></div>
+      </div>
+    </div>
+    <div class="warn-box">Never start work without payment. A signed contract with no payment means you're working on credit — that's how agencies lose money.</div>
+  </div>
+</div>
+
+<div class="step-card" id="s6">
+  <div class="step-header" onclick="toggleStep('s6')">
+    <div class="step-num" style="background:rgba(21,128,61,.1);color:var(--green)">06</div>
+    <div class="step-info">
+      <div class="step-title">Send the client intake questionnaire</div>
+      <div class="step-preview">Google Form → collect everything you need to build</div>
+    </div>
+    <div class="step-meta"><span class="tag tag-gray">Manual · 5 min</span><span class="chevron">▼</span></div>
+  </div>
+  <div class="step-body">
+    <div class="step-desc">Before you open Wix or Squarespace, you need content from the client. Create a simple Google Form and send it immediately after they sign. Give them a 3-day deadline to respond.</div>
+    <div class="step-section">
+      <div class="step-section-title">Intake form questions</div>
+      <div class="action-list">
+        <div class="action-item"><div class="action-text">What are your business hours?</div></div>
+        <div class="action-item"><div class="action-text">What are the 3 main services/products you offer?</div></div>
+        <div class="action-item"><div class="action-text">What sets you apart from competitors?</div></div>
+        <div class="action-item"><div class="action-text">Who is your typical customer? (age, location, problem they have)</div></div>
+        <div class="action-item"><div class="action-text">Do you have a logo? (upload) — if no, we'll create a simple one</div></div>
+        <div class="action-item"><div class="action-text">Upload 5–10 photos of your business, work, or products</div></div>
+        <div class="action-item"><div class="action-text">Any websites you like the look of? (paste links)</div></div>
+        <div class="action-item"><div class="action-text">Preferred color scheme? (or "I trust you")</div></div>
+        <div class="action-item"><div class="action-text">What do you want visitors to do on your site? (Call, book, order, visit)</div></div>
+      </div>
+    </div>
+    <div class="step-section">
+      <div class="step-section-title">Tools</div>
+      <div class="tool-row">
+        <div class="tool-pill"><div class="tool-pill-dot" style="background:#4285f4"></div>Google Forms (free)</div>
+        <div class="tool-pill"><div class="tool-pill-dot" style="background:#4285f4"></div>Google Drive (file storage)</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 3 -->
+<div class="phase-section" data-phase="3">
+<div class="phase-header" style="margin-top:32px">
+  <div class="phase-eyebrow">Phase 3</div>
+  <div class="phase-title">Build the Website</div>
+  <div class="phase-sub">From blank canvas to client-ready preview. Target: first mockup delivered within 48 hours of receiving intake responses.</div>
+</div>
+
+<div class="step-card" id="s7">
+  <div class="step-header" onclick="toggleStep('s7')">
+    <div class="step-num" style="background:rgba(37,99,235,.1);color:var(--blue)">07</div>
+    <div class="step-info">
+      <div class="step-title">Set up the client's tools</div>
+      <div class="step-preview">Domain, Wix project, Google tools — all before building</div>
+    </div>
+    <div class="step-meta"><span class="tag tag-gray">Manual · 30 min</span><span class="chevron">▼</span></div>
+  </div>
+  <div class="step-body">
+    <div class="step-section">
+      <div class="step-section-title">Setup checklist — do this first, every time</div>
+      <div class="action-list">
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Buy or transfer their domain (Namecheap or Google Domains ~$12/yr)</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Create a new site in Wix Studio — name it [ClientName] for easy search</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Set up Google Analytics 4 (free) — takes 10 min, tracks all future traffic</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Set up Google Search Console (free) — connects site to Google's index</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Check or create their Google Business Profile (GBP) — critical for local SEO</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Add client to BrightLocal (if on SEO plan) — start rank tracking</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Create a Google Drive folder with their name — store all assets here</div></div>
+      </div>
+    </div>
+    <div class="step-section">
+      <div class="step-section-title">Tools</div>
+      <div class="tool-row">
+        <div class="tool-pill"><div class="tool-pill-dot" style="background:#1a56db"></div>Wix Studio</div>
+        <div class="tool-pill"><div class="tool-pill-dot" style="background:#4285f4"></div>Google Analytics</div>
+        <div class="tool-pill"><div class="tool-pill-dot" style="background:#4285f4"></div>Search Console</div>
+        <div class="tool-pill"><div class="tool-pill-dot" style="background:#15803d"></div>BrightLocal (SEO plan)</div>
+        <div class="tool-pill"><div class="tool-pill-dot" style="background:#ea4335"></div>Namecheap (domains)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="step-card" id="s8">
+  <div class="step-header" onclick="toggleStep('s8')">
+    <div class="step-num" style="background:rgba(37,99,235,.1);color:var(--blue)">08</div>
+    <div class="step-info">
+      <div class="step-title">Build the website</div>
+      <div class="step-preview">Wix Studio → 48-hour turnaround target</div>
+    </div>
+    <div class="step-meta"><span class="tag tag-blue">Build · 4–8 hrs</span><span class="chevron">▼</span></div>
+  </div>
+  <div class="step-body">
+    <div class="step-desc">Use the client's intake form answers, photos, and references to build. Start from a Wix template close to their industry, then customize colors, fonts, content, and layout.</div>
+    <div class="step-section">
+      <div class="step-section-title">Standard pages for every client (Starter plan)</div>
+      <div class="action-list">
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Home — headline, key services, trust signals (reviews, years in business), CTA button</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">About — story, team photo if available, local connection</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Services — list each service with a short description and photo</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Contact — phone, email, address, embedded Google Map, contact form</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Reviews / Testimonials — pull 3–5 from Google (always ask permission)</div></div>
+      </div>
+    </div>
+    <div class="step-section">
+      <div class="step-section-title">On-page SEO (do on every page)</div>
+      <div class="action-list">
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Page title: "[Service] in [City], [State] | [Business Name]"</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Meta description: 150 chars, includes main keyword and location</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">H1 tag on every page includes city name</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Phone number clickable (tel: link) — critical for mobile</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Images compressed and named descriptively (not IMG_1234.jpg)</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="step-card" id="s9">
+  <div class="step-header" onclick="toggleStep('s9')">
+    <div class="step-num" style="background:rgba(37,99,235,.1);color:var(--blue)">09</div>
+    <div class="step-info">
+      <div class="step-title">Send mockup for client review</div>
+      <div class="step-preview">Loom video + preview link → client gives feedback</div>
+    </div>
+    <div class="step-meta"><span class="tag tag-gray">Manual · 20 min</span><span class="chevron">▼</span></div>
+  </div>
+  <div class="step-body">
+    <div class="step-desc">Don't just send a link — record a 3-minute Loom video walking through the site. Narrate your design decisions. This prevents 80% of misunderstandings and makes you look incredibly professional.</div>
+    <div class="step-section">
+      <div class="step-section-title">Loom video script</div>
+      <div class="script-box" id="script-s9">Hi [Name], I'm excited to share the first look at [Business Name]'s new website!
+
+Let me walk you through what I've built...
+
+[Homepage] — I led with your strongest selling point: [X]. The call-to-action button goes to your contact page.
+
+[About] — I used the description you gave me and added your photos here.
+
+[Services] — I broke out your three main services. Let me know if you want any wording changed.
+
+[Contact] — Your phone number, address, and a form so people can message you directly.
+
+I'd love your feedback on:
+1. Is the overall look and feel right for your brand?
+2. Is anything missing that customers often ask about?
+3. Any wording you'd like changed?
+
+Just reply to this email with your notes and I'll have revisions back to you within 24 hours. Excited to get this live for you!<button class="copy-btn" onclick="copyScript('script-s9')">Copy</button></div>
+    </div>
+    <div class="step-section">
+      <div class="step-section-title">Checklist</div>
+      <div class="action-list">
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Record Loom walkthrough of the full site (3–5 min)</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Send preview link + Loom link via email from your @grandriverdigital.agency address</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Set a 3-day response deadline in HubSpot as a reminder task</div></div>
+      </div>
+    </div>
+    <div class="step-section">
+      <div class="step-section-title">Tools</div>
+      <div class="tool-row">
+        <div class="tool-pill"><div class="tool-pill-dot" style="background:#ef4444"></div>Loom (screen recording)</div>
+        <div class="tool-pill"><div class="tool-pill-dot" style="background:#4285f4"></div>Gmail (Google Workspace)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="step-card" id="s10">
+  <div class="step-header" onclick="toggleStep('s10')">
+    <div class="step-num" style="background:rgba(37,99,235,.1);color:var(--blue)">10</div>
+    <div class="step-info">
+      <div class="step-title">Handle revisions</div>
+      <div class="step-preview">2 rounds included — track requests, apply changes, resend</div>
+    </div>
+    <div class="step-meta"><span class="tag tag-gray">Manual · 1–2 hrs</span><span class="chevron">▼</span></div>
+  </div>
+  <div class="step-body">
+    <div class="step-desc">Your contract includes 2 revision rounds. Apply all their feedback at once per round — don't do back-and-forth on individual items. After round 2, additional changes are billed at $75/hour.</div>
+    <div class="step-section">
+      <div class="step-section-title">Revision checklist</div>
+      <div class="action-list">
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">List every change requested in a Google Doc before touching anything</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Apply all changes in one session</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Record another short Loom showing what changed</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">If this is revision 2, note "this is your final round" in your email</div></div>
+      </div>
+    </div>
+    <div class="warn-box">Scope creep is real. "Can you also add a photo gallery, a booking system, and a blog?" after the design is approved = additional cost. Your contract should state this clearly, and so should you — politely but firmly.</div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 4 -->
+<div class="phase-section" data-phase="4">
+<div class="phase-header" style="margin-top:32px">
+  <div class="phase-eyebrow">Phase 4</div>
+  <div class="phase-title">Launch</div>
+  <div class="phase-sub">Going from "approved by client" to live on the internet. This is the most exciting part — and the most error-prone. Work through the checklist methodically.</div>
+</div>
+
+<div class="step-card" id="s11">
+  <div class="step-header" onclick="toggleStep('s11')">
+    <div class="step-num" style="background:rgba(217,119,6,.1);color:var(--amber)">11</div>
+    <div class="step-info">
+      <div class="step-title">Pre-launch checklist</div>
+      <div class="step-preview">Test everything before connecting the domain</div>
+    </div>
+    <div class="step-meta"><span class="tag tag-amber">Critical · 45 min</span><span class="chevron">▼</span></div>
+  </div>
+  <div class="step-body">
+    <div class="step-section">
+      <div class="step-section-title">Technical checks</div>
+      <div class="action-list">
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Test on desktop, tablet, and mobile (use Chrome DevTools)</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">All links work — no 404s or broken buttons</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Contact form submits and sends a confirmation email</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Phone number is clickable (tap on mobile to call)</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Google Maps embed loads correctly</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">All images load (no broken image icons)</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Page speed test (Google PageSpeed Insights) — aim for 80+ on mobile</div></div>
+      </div>
+    </div>
+    <div class="step-section">
+      <div class="step-section-title">Content checks</div>
+      <div class="action-list">
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Business name, address, and phone are correct on every page</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">No placeholder text (Lorem ipsum, "Your Name Here", etc.)</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Spelling and grammar checked (paste into Grammarly)</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Copyright year in footer is correct</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Privacy policy page exists (required for contact forms / Google Analytics)</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="step-card" id="s12">
+  <div class="step-header" onclick="toggleStep('s12')">
+    <div class="step-num" style="background:rgba(217,119,6,.1);color:var(--amber)">12</div>
+    <div class="step-info">
+      <div class="step-title">Go live</div>
+      <div class="step-preview">Connect domain → site is live on the internet</div>
+    </div>
+    <div class="step-meta"><span class="tag tag-amber">Launch day · 30 min</span><span class="chevron">▼</span></div>
+  </div>
+  <div class="step-body">
+    <div class="step-section">
+      <div class="step-section-title">Launch steps</div>
+      <div class="action-list">
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Connect domain in Wix (or point DNS records from Namecheap to Wix)</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Enable SSL (Wix does this automatically — confirm the padlock shows in the browser)</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Visit the live URL on your phone and computer to confirm it's working</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Verify Google Analytics is receiving live data (check Realtime tab)</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Submit sitemap to Google Search Console (speeds up Google indexing)</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Update domain in your grandriverdigital-dashboard.html — change "pending.com" to live domain</div></div>
+      </div>
+    </div>
+    <div class="step-section">
+      <div class="step-section-title">Notify the client</div>
+      <div class="script-box" id="script-s12">Hi [Name]!
+
+Great news — [Business Name] is officially live at [domain.com]!
+
+I've just confirmed everything is working perfectly. Here's what's now in place:
+- Your website is live and secure (SSL protected)
+- Google Analytics is tracking your visitors
+- Google can now find your site
+
+Take a look and let me know what you think. Over the next 48–72 hours, Google will start indexing your pages and you should begin appearing in local searches.
+
+I'll be in touch next month with your first performance report. In the meantime, feel free to share your new website with your customers!
+
+— [Your Name]<button class="copy-btn" onclick="copyScript('script-s12')">Copy</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="step-card" id="s13">
+  <div class="step-header" onclick="toggleStep('s13')">
+    <div class="step-num" style="background:rgba(217,119,6,.1);color:var(--amber)">13</div>
+    <div class="step-info">
+      <div class="step-title">Post-launch setup</div>
+      <div class="step-preview">Set up recurring billing, add to dashboard, begin SEO tracking</div>
+    </div>
+    <div class="step-meta"><span class="tag tag-gray">Admin · 20 min</span><span class="chevron">▼</span></div>
+  </div>
+  <div class="step-body">
+    <div class="step-section">
+      <div class="step-section-title">Your backend checklist</div>
+      <div class="action-list">
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Confirm Stripe recurring subscription is active (first charge should have processed)</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Update grandriverdigital-dashboard.html with live domain, set status to Active</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Add to BrightLocal — start tracking Google Maps ranking for 3 target keywords</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Set a calendar reminder for "Month 1 check-in" (14 days from now)</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Set a calendar reminder for "Monthly report" (first of next month)</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Log in Notion: client name, launch date, plan, domain, Google Analytics ID</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- PHASE 5 -->
+<div class="phase-section" data-phase="5">
+<div class="phase-header" style="margin-top:32px">
+  <div class="phase-eyebrow">Phase 5</div>
+  <div class="phase-title">Retain &amp; Grow</div>
+  <div class="phase-sub">This is where your agency becomes a real business. Monthly recurring work keeps clients paying and happy — and happy clients refer their friends. Your goal is zero churn.</div>
+</div>
+
+<div class="step-card" id="s14">
+  <div class="step-header" onclick="toggleStep('s14')">
+    <div class="step-num" style="background:rgba(220,38,38,.1);color:var(--red)">14</div>
+    <div class="step-info">
+      <div class="step-title">Monthly maintenance (every client, every month)</div>
+      <div class="step-preview">~30 min per client · do on the 1st of each month</div>
+    </div>
+    <div class="step-meta"><span class="tag tag-gray">Recurring</span><span class="chevron">▼</span></div>
+  </div>
+  <div class="step-body">
+    <div class="step-desc">This is what justifies the monthly fee. Block 2–3 hours on the first Monday of each month and go through every active client in your dashboard.</div>
+    <div class="step-section">
+      <div class="step-section-title">Monthly checklist (per client)</div>
+      <div class="action-list">
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Check site is loading correctly (visit the live URL)</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Wix auto-updates platform — confirm no display issues after updates</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Check Google Analytics: any big drops in traffic? Any spike in errors?</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Check contact form still submits (fill it out yourself)</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Apply any content changes the client requested that month (via email)</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Confirm SSL is still valid (browser padlock icon)</div></div>
+        <div class="action-item"><div class="action-check" onclick="check(this)"></div><div class="action-text">Confirm billing processed successfully in HoneyBook / Stripe</div></div>
+      </div>
+    </div>
+    <div class="info-box">Growth plan clients: also update any seasonal content (holiday hours, promotions) and swap out one photo if they've sent new ones. This is what separates Growth from Starter.</div>
+  </div>
+</div>
+
+<div class="step-card" id="s15">
+  <div class="step-header" onclick="toggleStep('s15')">
+    <div class="step-num" style="background:rgba(220,38,38,.1);color:var(--red)">15</div>
+    <div class="step-info">
+      <div class="step-title">Send monthly SEO report (Pro plan clients)</div>
+      <div class="step-preview">BrightLocal → auto-generates white-label PDF → email to client</div>
+    </div>
+    <div class="step-meta"><span class="tag tag-green">Automated</span><span class="chevron">▼</span></div>
+  </div>
+  <div class="step-body">
+    <div class="step-desc">BrightLocal automatically generates a branded PDF report showing Google Maps ranking, citation count, review changes, and local search visibility. Schedule it to send automatically on the 1st of each month.</div>
+    <div class="step-section">
+      <div class="step-section-title">Report email template</div>
+      <div class="script-box" id="script-s15">Hi [Name],
+
+Your [Month] website performance report is attached!
+
+Here are the highlights for [Business Name] this month:
+- Google Maps ranking for "[keyword]": #[X] (was #[Y] last month)
+- Website visitors: [N] people visited your site
+- Most popular page: [page name]
+- New Google reviews: [N]
+
+[If improving] You're making great progress! Keep encouraging happy customers to leave Google reviews — every one helps your ranking.
+
+[If stagnant] SEO takes time — typically 3–6 months to see major movement. You're building a strong foundation.
+
+Any questions about the report? Just reply to this email. See you next month!
+
+— [Your Name]<button class="copy-btn" onclick="copyScript('script-s15')">Copy</button></div>
+    </div>
+    <div class="step-section">
+      <div class="step-section-title">Tools</div>
+      <div class="tool-row">
+        <div class="tool-pill"><div class="tool-pill-dot" style="background:#15803d"></div>BrightLocal (auto-sends report)</div>
+        <div class="tool-pill"><div class="tool-pill-dot" style="background:#4285f4"></div>Gmail</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="step-card" id="s16">
+  <div class="step-header" onclick="toggleStep('s16')">
+    <div class="step-num" style="background:rgba(220,38,38,.1);color:var(--red)">16</div>
+    <div class="step-info">
+      <div class="step-title">Upsell &amp; upgrade conversations</div>
+      <div class="step-preview">Month 3+ · move Starter clients up, grow MRR</div>
+    </div>
+    <div class="step-meta"><span class="tag tag-gray">Recurring · Month 3+</span><span class="chevron">▼</span></div>
+  </div>
+  <div class="step-body">
+    <div class="step-desc">At month 3, you have real data. Use it. If a Starter client is getting 200+ visitors/month, that's the perfect moment to show them what SEO could do — and upgrade them to Growth or Pro.</div>
+    <div class="step-section">
+      <div class="step-section-title">Upsell triggers to watch for</div>
+      <div class="action-list">
+        <div class="action-item"><div class="action-text">Starter client getting 150+ monthly visitors → pitch Growth (maintenance)</div></div>
+        <div class="action-item"><div class="action-text">Growth client ranking #8–15 on Google → pitch Pro (SEO to push into top 3)</div></div>
+        <div class="action-item"><div class="action-text">Client mentions competitors ranking above them → perfect SEO pitch moment</div></div>
+        <div class="action-item"><div class="action-text">Client asks to add a feature outside their plan → upsell or bill hourly</div></div>
+        <div class="action-item"><div class="action-text">Client refers you to someone → they're happy, ask for a Google review</div></div>
+      </div>
+    </div>
+    <div class="step-section">
+      <div class="step-section-title">Upsell script</div>
+      <div class="script-box" id="script-s16">Hi [Name], I was reviewing your site stats this month and noticed something exciting.
+
+You're getting [X] visitors a month and your phone number was clicked [Y] times. That means your site is working.
+
+Here's the thing — you're currently showing up at position [#] on Google for "[keyword]." With our Pro plan, I'd be targeting to push you into the top 3, which typically means 3–5x more calls.
+
+The difference is $[150/200] more per month. Based on what you're already seeing, I think one new customer a month from that higher ranking would more than cover it.
+
+Want me to put together a quick keyword report showing the opportunity?<button class="copy-btn" onclick="copyScript('script-s16')">Copy</button></div>
+    </div>
+    <div class="info-box">The best time to upsell is right after delivering good news — a traffic increase, a new top-10 ranking, or a positive report. Lead with their win, then connect the upsell to getting more of it.</div>
+  </div>
+</div>
+</div>
+
+</main>
+</div>
+
+<script>
+function toggleStep(id){
+  const card=document.getElementById(id);
+  card.classList.toggle('open');
+  updateProgress();
+}
+function openStep(id){
+  const card=document.getElementById(id);
+  if(card&&!card.classList.contains('open'))card.classList.add('open');
+}
+function check(el){
+  el.classList.toggle('done');
+  const text=el.nextElementSibling;
+  if(text)text.classList.toggle('done');
+  if(el.classList.contains('done'))el.innerHTML='✓';
+  else el.innerHTML='';
+  updateProgress();
+}
+function updateProgress(){
+  const total=document.querySelectorAll('.action-check').length;
+  const done=document.querySelectorAll('.action-check.done').length;
+  document.getElementById('progressFill').style.width=(done/total*100)+'%';
+}
+function copyScript(id){
+  const el=document.getElementById(id);
+  const clone=el.cloneNode(true);
+  clone.querySelectorAll('button').forEach(b=>b.remove());
+  navigator.clipboard.writeText(clone.textContent.trim()).catch(()=>{});
+  const btn=el.querySelector('.copy-btn');
+  if(btn){btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000);}
+}
+function showPhase(phase,el){
+  document.querySelectorAll('.topnav-link').forEach(l=>l.classList.remove('active'));
+  el.classList.add('active');
+  const sections=document.querySelectorAll('.phase-section');
+  if(phase==='all'){sections.forEach(s=>s.style.display='block');}
+  else{sections.forEach(s=>s.style.display=s.dataset.phase===phase?'block':'none');}
+}
+document.querySelectorAll('.sb-step').forEach(link=>{
+  link.addEventListener('click',function(e){
+    e.preventDefault();
+    const href=this.getAttribute('href');
+    if(href){
+      const id=href.replace('#','');
+      openStep(id);
+      setTimeout(()=>{const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});},50);
+    }
+    document.querySelectorAll('.sb-step').forEach(s=>s.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+document.addEventListener('scroll',()=>{
+  const steps=document.querySelectorAll('.step-card');
+  let current='';
+  steps.forEach(s=>{
+    const rect=s.getBoundingClientRect();
+    if(rect.top<120)current=s.id;
+  });
+  if(current){
+    document.querySelectorAll('.sb-step').forEach(s=>{
+      const href=s.getAttribute('href');
+      s.classList.toggle('active',href==='#'+current);
+    });
+  }
+});
+</script>
+</body>
+</html>

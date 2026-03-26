@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grand River Digital — GRD Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--surface:#ffffff;--surface2:#f5f4f1;--surface3:#eceae4;
+--border:rgba(0,0,0,0.07);--border2:rgba(0,0,0,0.13);
+--text:#18181a;--muted:#6b6b6a;--hint:#a0a09a;
+--accent:#1a56db;--green:#15803d;--amber:#d97706;--red:#dc2626;--blue:#2563eb;--cyan:#0891b2;
+--font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+--font-mono:'SF Mono','Fira Code',monospace;
+--border-radius-md:8px;--border-radius-lg:12px;
+}
+body{font-family:var(--font-sans);color:var(--text);font-size:14px;background:var(--surface2)}
+.shell{display:flex;height:100vh;overflow:hidden}
+.sb{width:200px;flex-shrink:0;background:var(--surface);border-right:0.5px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sb-logo{padding:14px 13px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0}
+.sb-icon{width:26px;height:26px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex-shrink:0}
+.sb-brand{font-size:13px;font-weight:500}
+.sb-tagline{font-size:10px;color:var(--muted)}
+.sb-nav{flex:1;padding:8px 7px;display:flex;flex-direction:column;gap:1px;overflow-y:auto}
+.sb-sec{font-size:10px;color:var(--hint);font-weight:500;letter-spacing:.8px;padding:9px 5px 3px}
+.nb{display:flex;align-items:center;gap:7px;padding:6px 7px;border-radius:6px;cursor:pointer;font-size:12.5px;color:var(--muted);background:none;border:none;width:100%;text-align:left;font-family:var(--font-sans)}
+.nb:hover{background:var(--surface2);color:var(--text)}
+.nb.on{background:rgba(26,86,219,.1);color:var(--accent);font-weight:500}
+.nb .ico{font-size:12px;width:15px;text-align:center}
+.nb-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:9px;padding:1px 5px;border-radius:99px;font-weight:600}
+.nb-badge.g{background:var(--green)}
+.nb-badge.r{background:var(--red)}
+.sb-foot{padding:10px;border-top:0.5px solid var(--border);flex-shrink:0}
+.plan-pill{background:rgba(26,86,219,.07);border:0.5px solid rgba(26,86,219,.2);border-radius:7px;padding:9px 10px}
+.plan-pill .pl{font-size:10px;color:var(--muted);margin-bottom:2px}
+.plan-pill .pn{font-size:12px;color:var(--accent);font-weight:500}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.topbar{height:46px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:8px;background:var(--surface);flex-shrink:0}
+.back-btn{display:none;align-items:center;gap:4px;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:11px;color:var(--muted);background:none;border:0.5px solid var(--border2);font-family:var(--font-sans)}
+.back-btn:hover{background:var(--surface2);color:var(--text)}
+.back-btn.show{display:flex}
+.tb-title{font-size:13px;font-weight:500;flex:1}
+.live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.tb-live{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px}
+.btn{padding:5px 12px;border-radius:6px;font-size:11.5px;font-weight:500;cursor:pointer;border:0.5px solid var(--border2);background:var(--surface2);color:var(--text);font-family:var(--font-sans);transition:all .12s}
+.btn:hover{background:var(--surface3)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.primary:hover{opacity:.88}
+.btn.sm{padding:4px 9px;font-size:11px}
+.btn.success{background:rgba(21,128,61,.1);color:var(--green);border-color:rgba(21,128,61,.25)}
+.btn.danger{background:rgba(220,38,38,.07);color:var(--red);border-color:rgba(220,38,38,.2)}
+.btn.amber{background:rgba(217,119,6,.1);color:var(--amber);border-color:rgba(217,119,6,.25)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.scroll{flex:1;overflow-y:auto;padding:14px;min-height:0}
+.scroll::-webkit-scrollbar{width:4px}
+.scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+.pg{display:none}.pg.on{display:block}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.sc{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--border-radius-lg);padding:12px}
+.sc-lbl{font-size:10px;color:var(--muted);font-weight:500;margin-bottom:5px;letter-spacing:.3px}
+.sc-val{font-size:20px;font-weight:500;line-height:1.1;margin-bottom:3px}
+.sc-delta{font-size:10px}
+.up{color:var(--green)}.dn{color:var(--red)}.neu{color:var(--muted)}
+.card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:10px}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ct{font-size:12.5px;font-weight:500}
+.cs{font-size:10px;color:var(--muted);margin-top:1px}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:10px}
+.badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:500}
+.bg{background:rgba(21,128,61,.1);color:var(--green)}
+.br{background:rgba(220,38,38,.1);color:var(--red)}
+.ba{background:rgba(217,119,6,.1);color:var(--amber)}
+.bb{background:rgba(37,99,235,.1);color:var(--blue)}
+.bp{background:rgba(26,86,219,.1);color:var(--accent)}
+.bx{background:var(--surface2);color:var(--muted)}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:11.5px}
+th{font-size:10px;color:var(--muted);font-weight:500;text-align:left;padding:0 0 7px;border-bottom:0.5px solid var(--border);letter-spacing:.3px}
+td{padding:8px 0;border-bottom:0.5px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.av{width:26px;height:26px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0}
+.cr{display:flex;align-items:center;gap:7px}
+.cn{font-weight:500;font-size:11.5px}
+.cd{font-size:10px;color:var(--muted);font-family:var(--font-mono)}
+.bars{display:flex;align-items:flex-end;height:110px;gap:4px;padding:0 2px}
+.bar{flex:1;border-radius:3px 3px 0 0;cursor:pointer;min-width:0;position:relative}
+.bar:hover{opacity:.7}
+.bar-tip{position:absolute;top:-20px;left:50%;transform:translateX(-50%);background:var(--surface2);border:0.5px solid var(--border2);font-size:9px;padding:2px 5px;border-radius:3px;white-space:nowrap;pointer-events:none;display:none;color:var(--text)}
+.bar:hover .bar-tip{display:block}
+.blbls{display:flex;gap:4px;margin-top:5px}
+.blbls span{flex:1;font-size:9px;color:var(--muted);text-align:center;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pb{height:3px;background:var(--surface2);border-radius:99px;margin-top:6px;overflow:hidden}
+.pf{height:100%;border-radius:99px}
+.hg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:10px}
+.hc{background:var(--surface2);border-radius:var(--border-radius-md);padding:10px}
+.hl{font-size:10px;color:var(--muted);margin-bottom:5px}
+.hv{font-size:18px;font-weight:500;font-family:var(--font-mono)}
+.udots{display:flex;gap:3px;flex-wrap:wrap;margin-top:8px}
+.dot{width:10px;height:10px;border-radius:2px;cursor:pointer;position:relative}
+.dot:hover::after{content:attr(data-tip);position:absolute;top:-24px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--surface);font-size:9px;padding:2px 5px;border-radius:3px;white-space:nowrap;z-index:10}
+.cg{display:grid;grid-template-columns:210px minmax(0,1fr);gap:10px;height:490px}
+.clist-wrap{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--border-radius-lg);overflow:hidden;display:flex;flex-direction:column}
+.clh{padding:9px 12px;border-bottom:0.5px solid var(--border);font-size:11px;font-weight:500;flex-shrink:0}
+.clist-scroll{overflow-y:auto;flex:1}
+.clist-scroll::-webkit-scrollbar{width:4px}
+.clist-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+.cli{padding:9px 12px;border-bottom:0.5px solid var(--border);cursor:pointer;display:flex;align-items:center;gap:8px}
+.cli:last-child{border-bottom:none}
+.cli:hover{background:var(--surface2)}
+.cli.on{background:rgba(26,86,219,.07)}
+.cli-n{font-size:11.5px;font-weight:500}
+.cli-p{font-size:10px;color:var(--muted);margin-top:1px}
+.cdet{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--border-radius-lg);padding:16px;overflow-y:auto}
+.cdet::-webkit-scrollbar{width:4px}
+.cdet::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+.ds{margin-bottom:14px}
+.dsh{font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px}
+.dr{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:0.5px solid var(--border);font-size:11.5px}
+.dr:last-child{border-bottom:none}
+.dk{color:var(--muted)}
+.dv{font-weight:500;font-family:var(--font-mono);font-size:10.5px}
+.sform{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.sfg{display:flex;flex-direction:column;gap:4px;flex:1;min-width:120px}
+.slbl{font-size:10px;color:var(--muted);font-weight:500}
+.sinput,.ssel{background:var(--surface2);border:0.5px solid var(--border2);color:var(--text);padding:7px 9px;border-radius:6px;font-size:11.5px;font-family:var(--font-sans);outline:none;width:100%}
+.sinput:focus,.ssel:focus{border-color:var(--accent)}
+.prog-track{height:4px;background:var(--surface2);border-radius:99px;overflow:hidden;margin-top:10px;margin-bottom:5px}
+.prog-fill{height:100%;border-radius:99px;background:var(--accent);transition:width .3s ease;width:0%}
+.sstat{font-size:10px;color:var(--muted)}
+.rgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.rcard{background:var(--surface2);border:0.5px solid var(--border);border-left:2px solid transparent;border-radius:var(--border-radius-md);padding:10px;cursor:pointer;transition:border-color .12s,background .12s}
+.rcard:hover{border-left-color:var(--border2)}
+.rcard.sel{border-left-color:var(--accent);background:rgba(26,86,219,.04)}
+.rbiz{font-weight:500;font-size:12.5px;margin-bottom:1px}
+.rtype{font-size:10px;color:var(--muted);margin-bottom:7px}
+.rmeta{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.rt{font-size:10px;background:var(--surface);border-radius:3px;padding:2px 6px;color:var(--muted);border:0.5px solid var(--border)}
+.rt.g{background:rgba(21,128,61,.07);color:var(--green);border-color:rgba(21,128,61,.2)}
+.ract{display:flex;gap:5px}
+.outreach-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:0.5px solid var(--border);background:var(--surface);transition:opacity .2s}
+.outreach-footer.faded{opacity:.3;pointer-events:none}
+.of-left{font-size:11px;color:var(--muted)}
+.of-sel{font-size:11px;font-weight:500;color:var(--accent);margin-top:1px}
+.seobar{flex:1;max-width:70px;height:3px;background:var(--surface2);border-radius:99px;overflow:hidden;display:inline-block;vertical-align:middle;margin-left:5px}
+.seofill{height:100%;border-radius:99px}
+.od-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:0.5px solid var(--border)}
+.od-av{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;flex-shrink:0}
+.od-name{font-size:15px;font-weight:500}
+.od-meta{font-size:11px;color:var(--muted);margin-top:3px}
+.otabs{display:flex;gap:2px;padding:3px;background:var(--surface2);border-radius:7px;width:fit-content;margin-bottom:12px}
+.otab{padding:4px 12px;border-radius:5px;font-size:11.5px;cursor:pointer;color:var(--muted);background:none;border:none;font-family:var(--font-sans)}
+.otab.on{background:var(--surface);color:var(--text)}
+.email-box{background:var(--surface2);border:0.5px solid var(--border);border-radius:8px;padding:14px;font-size:11px;color:var(--text);line-height:1.8;font-family:var(--font-mono);white-space:pre-line;margin-bottom:10px}
+.lead-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--border)}
+.lead-row:last-child{border-bottom:none}
+.lead-info{display:flex;align-items:center;gap:10px}
+.lead-av{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.lead-name{font-size:12px;font-weight:500}
+.lead-meta{font-size:10px;color:var(--muted);margin-top:1px}
+.lead-actions{display:flex;gap:5px;align-items:center}
+.empty-state{text-align:center;padding:36px 20px;color:var(--muted)}
+.empty-icon{font-size:26px;margin-bottom:8px}
+.empty-txt{font-size:11.5px;line-height:1.6}
+
+/* NEW SIGNUPS BANNER */
+.new-banner{background:rgba(21,128,61,.08);border:0.5px solid rgba(21,128,61,.25);border-radius:var(--border-radius-md);padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.new-banner-text{font-size:12px;color:var(--green);font-weight:500}
+.new-banner-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.new-badge{background:var(--green);color:#fff;font-size:9px;padding:2px 7px;border-radius:99px;font-weight:600;margin-left:6px}
+
+/* SOURCE TAG */
+.source-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;background:rgba(21,128,61,.08);color:var(--green);border:0.5px solid rgba(21,128,61,.2);border-radius:4px;padding:1px 6px}
+
+.moverlay{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:50}
+.moverlay.on{display:flex}
+.modal{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--border-radius-lg);padding:20px;width:400px;max-width:90%}
+.mttl{font-size:14px;font-weight:500;margin-bottom:3px}
+.msub{font-size:11px;color:var(--muted);margin-bottom:16px}
+.mform{display:flex;flex-direction:column;gap:10px}
+.fg{display:flex;flex-direction:column;gap:4px}
+.flbl{font-size:10px;color:var(--muted);font-weight:500}
+.fi{background:var(--surface2);border:0.5px solid var(--border2);color:var(--text);padding:7px 9px;border-radius:6px;font-size:11.5px;font-family:var(--font-sans);outline:none;width:100%}
+.fi:focus{border-color:var(--accent)}
+.mact{display:flex;justify-content:flex-end;gap:7px;margin-top:14px}
+.g2f{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--text);color:var(--surface);padding:7px 14px;border-radius:6px;font-size:11px;font-weight:500;z-index:99;opacity:0;transition:opacity .25s;pointer-events:none}
+.toast.on{opacity:1}
+
+.cb-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:10px}
+.cb-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.cb-info{flex:1}
+.cb-name{font-size:13px;font-weight:500}
+.cb-biz{font-size:11px;color:var(--muted);margin-top:1px}
+.cb-time{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:12px}
+.cb-status{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:500}
+.cb-pending{background:rgba(217,119,6,.1);color:var(--amber)}
+.cb-confirmed{background:rgba(21,128,61,.1);color:var(--green)}
+.cb-declined{background:rgba(220,38,38,.08);color:var(--red)}
+.cb-actions{display:flex;gap:7px;flex-wrap:wrap}
+.billing-note{font-size:10.5px;background:rgba(217,119,6,.07);border:0.5px solid rgba(217,119,6,.2);border-radius:5px;padding:5px 9px;color:var(--amber);margin-top:6px}
+</style>
+</head>
+<body>
+<script>
+/* Grand River Digital — Admin Auth Guard */
+(async function(){
+  const H='18bbbec8bd46ee18b107b185aaea73ef6e0c8e7db524f821d1b3c96d51c8a03a';
+  const s=sessionStorage.getItem('grd_admin');
+  if(!s||s!==H){window.location.replace('/admin/');}
+})();
+</script>
+<div class="shell">
+<div class="sb">
+  <div class="sb-logo">
+    <div class="sb-icon">&#9889;</div>
+    <div><div class="sb-brand">Grand River Digital</div><div class="sb-tagline">GRD Dashboard</div></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec">Overview</div>
+    <button class="nb on" onclick="nav('overview',this)"><span class="ico">&#9670;</span>Dashboard</button>
+    <button class="nb" onclick="nav('revenue',this)"><span class="ico">$</span>Revenue</button>
+    <div class="sb-sec">Clients</div>
+    <button class="nb" onclick="nav('clients',this)"><span class="ico">&#128101;</span>Clients<span class="nb-badge" id="clientBadge">12</span></button>
+    <button class="nb" onclick="nav('hosting',this)"><span class="ico">&#9635;</span>Hosting</button>
+    <button class="nb" onclick="nav('seo',this)"><span class="ico">&#128200;</span>SEO Tracker</button>
+    <div class="sb-sec">Prospecting</div>
+    <button class="nb" onclick="nav('scanner',this)"><span class="ico">&#128269;</span>Maps Scanner</button>
+    <button class="nb" onclick="nav('leads',this)"><span class="ico">&#127775;</span>Leads<span class="nb-badge g" id="leadBadge">0</span></button>
+    <button class="nb" onclick="nav('callbacks',this)"><span class="ico">&#128197;</span>Callbacks<span class="nb-badge r" id="callbackBadge" style="display:none">0</span></button>
+  </nav>
+  <div class="sb-foot">
+    <div class="plan-pill"><div class="pl">Agency Plan</div><div class="pn">Pro Unlimited &#10022;</div></div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <button class="back-btn" id="backBtn" onclick="goBack()">&#8592; Back</button>
+    <div class="tb-title" id="ttl">Dashboard</div>
+    <a href="/index.html" style="font-size:11px;color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;border:0.5px solid var(--border2);margin-right:4px">&#8592; Site</a>
+    <button onclick="sessionStorage.removeItem('grd_admin');window.location.href='/admin/';" style="font-size:11px;color:var(--muted);background:none;border:0.5px solid var(--border2);border-radius:5px;padding:4px 9px;cursor:pointer;font-family:var(--font-sans);margin-right:8px">Log out</button>
+    <div class="tb-live"><span class="live-dot"></span>All systems live</div>
+    <button class="btn primary sm" onclick="openModal()">+ Add Client</button>
+  </div>
+  <div class="scroll" id="mainScroll">
+
+  <!-- OVERVIEW -->
+  <div class="pg on" id="pg-overview">
+    <div id="newSignupBanner" style="display:none" class="new-banner">
+      <div>
+        <div class="new-banner-text">&#127881; New signup(s) from your landing page! <span class="new-badge" id="newSignupCount">0</span></div>
+        <div class="new-banner-sub">These clients have been added to your roster automatically.</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn success sm" onclick="nav('clients',document.querySelectorAll('.nb')[2])">View clients &#8594;</button>
+        <button class="btn sm" onclick="dismissBanner()">Dismiss</button>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="sc"><div class="sc-lbl">MRR</div><div class="sc-val" style="color:var(--green)" id="ovMrr">$0</div><div class="sc-delta up" id="ovMrrDelta"></div></div>
+      <div class="sc"><div class="sc-lbl">Active Clients</div><div class="sc-val" style="color:var(--blue)" id="ovClients">0</div><div class="sc-delta up">&#8593; growing</div></div>
+      <div class="sc"><div class="sc-lbl">Hosted Sites</div><div class="sc-val" style="color:var(--amber)" id="ovHosted">0</div><div class="sc-delta neu">99.97% avg uptime</div></div>
+      <div class="sc"><div class="sc-lbl">Open Leads</div><div class="sc-val" style="color:var(--accent)" id="ovLeadCount">0</div><div class="sc-delta neu">In pipeline</div></div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="ch"><div><div class="ct">Revenue Trend</div><div class="cs">Last 8 months</div></div><span class="badge bg">+18% MoM</span></div>
+        <div class="bars" id="ovChart"></div>
+        <div class="blbls" id="ovLabels"></div>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ct">Services Breakdown</div></div>
+        <div style="display:flex;flex-direction:column;gap:9px" id="ovBreakdown"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><div><div class="ct">Recent Clients</div><div class="cs">Latest signups</div></div><button class="btn sm" onclick="nav('clients',document.querySelectorAll('.nb')[2])">View all &#8594;</button></div>
+      <div class="tw"><table><thead><tr><th>Client</th><th>Source</th><th>Plan</th><th>MRR</th><th>Status</th></tr></thead><tbody id="ovTable"></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- REVENUE -->
+  <div class="pg" id="pg-revenue">
+    <div class="stats">
+      <div class="sc"><div class="sc-lbl">MRR</div><div class="sc-val" style="color:var(--green)" id="revMrr">$0</div><div class="sc-delta up">&#8593; growing</div></div>
+      <div class="sc"><div class="sc-lbl">ARR Projected</div><div class="sc-val" style="color:var(--blue)" id="revArr">$0</div><div class="sc-delta up">&#8593; 18% YoY</div></div>
+      <div class="sc"><div class="sc-lbl">Outstanding</div><div class="sc-val" style="color:var(--amber)">$1,450</div><div class="sc-delta neu">3 invoices pending</div></div>
+      <div class="sc"><div class="sc-lbl">Churn Rate</div><div class="sc-val" style="color:var(--green)">0%</div><div class="sc-delta up">No cancellations</div></div>
+    </div>
+    <div class="card">
+      <div class="ch"><div><div class="ct">Monthly Revenue</div><div class="cs">12-month history</div></div></div>
+      <div class="bars" id="revChart" style="height:130px"></div>
+      <div class="blbls" id="revLabels"></div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct">Invoices</div><button class="btn primary sm">+ New Invoice</button></div>
+      <table><thead><tr><th>Invoice</th><th>Client</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody id="invTable"></tbody></table>
+    </div>
+  </div>
+
+  <!-- CLIENTS -->
+  <div class="pg" id="pg-clients">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div><div style="font-size:14px;font-weight:500">Client Management</div><div style="font-size:11px;color:var(--muted);margin-top:2px">All clients, plans, and details</div></div>
+      <button class="btn primary sm" onclick="openModal()">+ Add Client</button>
+    </div>
+    <div class="cg">
+      <div class="clist-wrap">
+        <div class="clh" id="clh">All Clients</div>
+        <div class="clist-scroll" id="clistScroll"></div>
+      </div>
+      <div class="cdet" id="cdet"><div class="empty-state"><div class="empty-icon">&#128101;</div><div class="empty-txt">Select a client</div></div></div>
+    </div>
+  </div>
+
+  <!-- HOSTING -->
+  <div class="pg" id="pg-hosting">
+    <div style="font-size:14px;font-weight:500;margin-bottom:10px">Hosting &amp; Infrastructure</div>
+    <div class="hg">
+      <div class="hc"><div class="hl">CPU Usage</div><div class="hv" style="color:var(--green)">12%</div><div style="font-size:10px;color:var(--muted)">4 vCPU cores</div><div class="pb"><div class="pf" style="width:12%;background:var(--green)"></div></div></div>
+      <div class="hc"><div class="hl">RAM Usage</div><div class="hv" style="color:var(--blue)">3.2 GB</div><div style="font-size:10px;color:var(--muted)">of 8GB</div><div class="pb"><div class="pf" style="width:40%;background:var(--blue)"></div></div></div>
+      <div class="hc"><div class="hl">Storage</div><div class="hv" style="color:var(--amber)">67 GB</div><div style="font-size:10px;color:var(--muted)">of 200GB</div><div class="pb"><div class="pf" style="width:33%;background:var(--amber)"></div></div></div>
+      <div class="hc"><div class="hl">Bandwidth</div><div class="hv" style="color:var(--cyan)">842 GB</div><div style="font-size:10px;color:var(--muted)">this month</div><div class="pb"><div class="pf" style="width:28%;background:var(--cyan)"></div></div></div>
+      <div class="hc"><div class="hl">Avg Response</div><div class="hv" style="color:var(--green)">84ms</div><div style="font-size:10px;color:var(--muted)">Excellent</div><div class="pb"><div class="pf" style="width:8%;background:var(--green)"></div></div></div>
+      <div class="hc"><div class="hl">Monthly Uptime</div><div class="hv" style="color:var(--green)">99.97%</div><div style="font-size:10px;color:var(--muted)">14 min downtime</div><div class="pb"><div class="pf" style="width:99.97%;background:var(--green)"></div></div></div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct">Hosted Websites</div></div>
+      <table><thead><tr><th>Domain</th><th>Client</th><th>SSL</th><th>Uptime</th><th>Status</th></tr></thead><tbody id="hostTable"></tbody></table>
+    </div>
+    <div class="card">
+      <div class="ch"><div><div class="ct">30-Day Uptime History</div><div class="cs">Each square = 1 day</div></div></div>
+      <div class="udots" id="udots"></div>
+    </div>
+  </div>
+
+  <!-- SEO -->
+  <div class="pg" id="pg-seo">
+    <div class="stats">
+      <div class="sc"><div class="sc-lbl">Avg Position</div><div class="sc-val" style="color:var(--green)">14.2</div><div class="sc-delta up">&#8593; 3.1 positions</div></div>
+      <div class="sc"><div class="sc-lbl">Keywords Tracked</div><div class="sc-val" style="color:var(--blue)">148</div><div class="sc-delta up">&#8593; 22 new</div></div>
+      <div class="sc"><div class="sc-lbl">Top 10 Rankings</div><div class="sc-val" style="color:var(--amber)">31</div><div class="sc-delta up">&#8593; 8 this month</div></div>
+      <div class="sc"><div class="sc-lbl">Avg Page Score</div><div class="sc-val" style="color:var(--accent)">78</div><div class="sc-delta up">&#8593; 4 points</div></div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct">Keyword Rankings by Client</div></div>
+      <table><thead><tr><th>Client</th><th>Top Keyword</th><th>Position</th><th>Score</th><th>Change</th><th>Status</th></tr></thead><tbody id="seoTable"></tbody></table>
+    </div>
+  </div>
+
+  <!-- SCANNER -->
+  <div class="pg" id="pg-scanner">
+    <div class="card" style="margin-bottom:10px">
+      <div class="ct" style="font-size:14px;margin-bottom:3px">&#128506; Google Maps Business Scanner</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Find local businesses without websites &mdash; your next clients</div>
+      <div class="sform">
+        <div class="sfg"><label class="slbl">Location / City</label><input class="sinput" id="scCity" value="Sterling Heights, MI"></div>
+        <div class="sfg"><label class="slbl">Business Type</label>
+          <select class="ssel" id="scType"><option>All businesses</option><option>Restaurants &amp; Food</option><option>Auto Repair Shops</option><option>Plumbers &amp; HVAC</option><option>Hair &amp; Beauty Salons</option><option>Retail Stores</option><option>Contractors</option><option>Medical &amp; Dental</option><option>Pet Services</option><option>Law Firms</option></select>
+        </div>
+        <div class="sfg" style="max-width:88px"><label class="slbl">Radius (mi)</label>
+          <select class="ssel" id="scRad"><option>5</option><option selected>10</option><option>25</option><option>50</option></select>
+        </div>
+        <div class="sfg" style="max-width:88px"><label class="slbl">Results</label>
+          <select class="ssel" id="scLim"><option>10</option><option selected>20</option><option>50</option></select>
+        </div>
+        <button class="btn primary" id="scanBtn" onclick="startScan()" style="align-self:flex-end;padding:7px 16px">&#128269; Scan Now</button>
+      </div>
+      <div id="scanProg" style="display:none">
+        <div class="prog-track"><div class="prog-fill" id="pbar"></div></div>
+        <div class="sstat" id="sstat"></div>
+      </div>
+    </div>
+    <div id="scanResultsBox" style="display:none">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:10px 14px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <div><span style="font-size:12.5px;font-weight:500">Scan Results</span><div style="font-size:10px;color:var(--muted);margin-top:1px">Found <span id="leadCount" style="color:var(--green);font-weight:600">0</span> businesses without websites &mdash; click a card to select</div></div>
+          <button class="btn sm" onclick="exportCSV()">&#8595; Export CSV</button>
+        </div>
+        <div style="padding:10px;max-height:290px;overflow-y:auto">
+          <div class="rgrid" id="rgrid"></div>
+        </div>
+        <div class="outreach-footer faded" id="outreachFooter">
+          <div>
+            <div class="of-left">Generate outreach for selected business</div>
+            <div class="of-sel" id="ofSelName">No business selected</div>
+          </div>
+          <button class="btn primary sm" onclick="goOutreach()">&#9993; Generate Outreach &#8594;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEADS -->
+  <div class="pg" id="pg-leads">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div><div style="font-size:14px;font-weight:500">Leads Pipeline</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Businesses added from scanner</div></div>
+      <button class="btn sm" onclick="nav('scanner',document.querySelectorAll('.nb')[5])">&#128269; Scan More</button>
+    </div>
+    <div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+      <div class="sc"><div class="sc-lbl">Total Leads</div><div class="sc-val" style="color:var(--accent)" id="lsTotal">0</div><div class="sc-delta neu">In pipeline</div></div>
+      <div class="sc"><div class="sc-lbl">Contacted</div><div class="sc-val" style="color:var(--amber)" id="lsContacted">0</div><div class="sc-delta neu">Awaiting response</div></div>
+      <div class="sc"><div class="sc-lbl">Converted</div><div class="sc-val" style="color:var(--green)" id="lsConverted">0</div><div class="sc-delta neu">Became clients</div></div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct">All Leads</div></div>
+      <div id="leadsList"><div class="empty-state"><div class="empty-icon">&#127775;</div><div class="empty-txt">No leads yet.<br>Run the Maps Scanner and click "Add Lead".</div></div></div>
+    </div>
+  </div>
+
+
+  <!-- CALLBACKS -->
+  <div class="pg" id="pg-callbacks">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div><div style="font-size:14px;font-weight:500">Callback Requests</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Confirm or decline client-requested call slots</div></div>
+    </div>
+    <div id="callbacksList">
+      <div class="empty-state"><div class="empty-icon">&#128197;</div><div class="empty-txt">No pending callbacks.<br>New requests from the landing page will appear here.</div></div>
+    </div>
+  </div>
+
+  <!-- OUTREACH DETAIL -->
+  <div class="pg" id="pg-outreach-detail">
+    <div class="card">
+      <div class="od-header" id="odHeader"></div>
+      <div class="otabs">
+        <button class="otab on" onclick="switchOutreachTab('cold',this)">Cold Email</button>
+        <button class="otab" onclick="switchOutreachTab('followup',this)">Follow-up</button>
+        <button class="otab" onclick="switchOutreachTab('sms',this)">SMS Script</button>
+      </div>
+      <div class="email-box" id="emailBody"></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn primary sm" onclick="copyCurrentEmail()">&#128203; Copy</button>
+        <button class="btn success sm" onclick="addCurrentLeadFromOutreach()">+ Save to Leads</button>
+      </div>
+    </div>
+  </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ADD CLIENT MODAL -->
+<div class="moverlay" id="modal">
+  <div class="modal">
+    <div class="mttl">Add New Client</div>
+    <div class="msub">Enter details to create client account</div>
+    <div class="mform">
+      <div class="g2f">
+        <div class="fg"><label class="flbl">Business Name</label><input class="fi" id="mn" placeholder="Acme Plumbing"></div>
+        <div class="fg"><label class="flbl">Contact Name</label><input class="fi" id="mcn" placeholder="Jane Smith"></div>
+      </div>
+      <div class="g2f">
+        <div class="fg"><label class="flbl">Email</label><input class="fi" id="me" placeholder="jane@biz.com"></div>
+        <div class="fg"><label class="flbl">Phone</label><input class="fi" id="mp" placeholder="(555) 000-0000"></div>
+      </div>
+      <div class="fg"><label class="flbl">Domain</label><input class="fi" id="md" placeholder="mybusiness.com"></div>
+      <div class="g2f">
+        <div class="fg"><label class="flbl">Plan</label>
+          <select class="fi" id="mpl"><option value="Starter">Starter — $149/mo</option><option value="Growth">Growth — $299/mo</option><option value="Pro">Pro — $499/mo</option><option value="Enterprise">Enterprise — Custom</option></select>
+        </div>
+        <div class="fg"><label class="flbl">Services</label>
+          <select class="fi" id="msv"><option>Hosting Only</option><option>Hosting + Maintenance</option><option>Full Package (+ SEO)</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="mact">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn primary" onclick="addClientManual()">Add Client &#8594;</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── SEED CLIENTS ───────────────────────────────────────────────────────────
+const seedClients = [
+  {id:1,name:"Sterling Auto Care",contact:"Mike Caruso",domain:"sterlingautocare.com",email:"mike@sterlingautocare.com",phone:"(586) 421-0012",plan:"Pro",mrr:499,status:"Active",services:"Hosting + Maintenance + SEO",joined:"Jan 15, 2025",next:"Apr 15, 2025",color:"#1a56db",source:"Direct"},
+  {id:2,name:"Detroit Pizza House",contact:"Joe Amato",domain:"detroitpizzahouse.com",email:"joe@detroitpizzahouse.com",phone:"(313) 555-4433",plan:"Growth",mrr:299,status:"Active",services:"Hosting + Maintenance",joined:"Feb 3, 2025",next:"Apr 3, 2025",color:"#15803d",source:"Direct"},
+  {id:3,name:"Great Lakes Dental",contact:"Dr. Karen Smith",domain:"greatlakesdental.com",email:"dr.smith@greatlakes.com",phone:"(248) 900-1122",plan:"Pro",mrr:499,status:"Active",services:"Hosting + Maintenance + SEO",joined:"Nov 10, 2024",next:"Apr 10, 2025",color:"#2563eb",source:"Direct"},
+  {id:4,name:"Metro Cleaning Co",contact:"Linda Osei",domain:"metrocleaningco.com",email:"info@metrocleaning.com",phone:"(734) 667-2210",plan:"Starter",mrr:149,status:"Active",services:"Hosting Only",joined:"Mar 1, 2025",next:"Apr 1, 2025",color:"#0891b2",source:"Direct"},
+  {id:5,name:"Oakland Gym & Fitness",contact:"Todd Reeves",domain:"oaklandgymfit.com",email:"todd@oaklandgym.com",phone:"(248) 441-5500",plan:"Growth",mrr:299,status:"Active",services:"Hosting + Maintenance",joined:"Dec 5, 2024",next:"Apr 5, 2025",color:"#d97706",source:"Direct"},
+  {id:6,name:"Sunrise Realty Group",contact:"Sarah Nguyen",domain:"sunriserealty.com",email:"sarah@sunriserealty.com",phone:"(586) 772-9033",plan:"Enterprise",mrr:799,status:"Active",services:"Full Package + Custom Dev",joined:"Oct 20, 2024",next:"Apr 20, 2025",color:"#9333ea",source:"Direct"},
+  {id:7,name:"Macomb HVAC Pros",contact:"Bill Kowalski",domain:"macomhvacpros.com",email:"bill@macomhvac.com",phone:"(586) 500-3344",plan:"Pro",mrr:499,status:"Active",services:"Hosting + Maintenance + SEO",joined:"Jan 28, 2025",next:"Apr 28, 2025",color:"#06b6d4",source:"Direct"},
+  {id:8,name:"Bella Hair Studio",contact:"Bella Russo",domain:"bellahairstudio.com",email:"bella@bellahair.com",phone:"(248) 334-0099",plan:"Starter",mrr:149,status:"Overdue",services:"Hosting Only",joined:"Feb 14, 2025",next:"Mar 14, 2025",color:"#ec4899",source:"Direct"},
+  {id:9,name:"Eastside Plumbing",contact:"Kevin Marsh",domain:"eastsideplumbing.com",email:"kevin@eastsideplumbing.com",phone:"(313) 228-4411",plan:"Growth",mrr:299,status:"Active",services:"Hosting + Maintenance",joined:"Mar 10, 2025",next:"Apr 10, 2025",color:"#15803d",source:"Direct"},
+  {id:10,name:"Royal Paws Pet Spa",contact:"Amy Chen",domain:"royalpawspetspa.com",email:"amy@royalpaws.com",phone:"(248) 771-6655",plan:"Starter",mrr:149,status:"Active",services:"Hosting Only",joined:"Mar 18, 2025",next:"Apr 18, 2025",color:"#d97706",source:"Direct"},
+  {id:11,name:"Varsity Law Group",contact:"Marcus Grant",domain:"varsitylaw.com",email:"mgrant@varsitylaw.com",phone:"(313) 900-0044",plan:"Pro",mrr:499,status:"Active",services:"Hosting + Maintenance + SEO",joined:"Feb 22, 2025",next:"Apr 22, 2025",color:"#1a56db",source:"Direct"},
+  {id:12,name:"Fresh Market Deli",contact:"Anna Petrov",domain:"freshmarketdeli.com",email:"anna@freshmarket.com",phone:"(586) 112-8833",plan:"Starter",mrr:149,status:"Paused",services:"Hosting Only",joined:"Jan 5, 2025",next:"\u2014",color:"#2563eb",source:"Direct"},
+];
+
+const avColors=['#1a56db','#15803d','#2563eb','#d97706','#0891b2','#9333ea','#ec4899','#06b6d4'];
+const D = {
+  leads: [],
+  currentScanLead: null,
+  currentOutreachLead: null,
+  currentOutreachTab: 'cold',
+  prevPage: null,
+  rev8:[3200,3800,4100,4800,5200,6100,6900,8240],mon8:['Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'],
+  rev12:[1200,1800,2400,2900,3200,3800,4100,4800,5200,6100,6900,8240],mon12:['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'],
+  invoices:[
+    {id:'INV-042',client:'Sterling Auto Care',amt:499,status:'Paid',date:'Mar 15, 2025'},
+    {id:'INV-041',client:'Sunrise Realty Group',amt:799,status:'Paid',date:'Mar 20, 2025'},
+    {id:'INV-040',client:'Bella Hair Studio',amt:149,status:'Overdue',date:'Mar 14, 2025'},
+    {id:'INV-039',client:'Great Lakes Dental',amt:499,status:'Paid',date:'Mar 10, 2025'},
+    {id:'INV-038',client:'Metro Cleaning Co',amt:149,status:'Pending',date:'Apr 1, 2025'},
+    {id:'INV-037',client:'Varsity Law Group',amt:499,status:'Pending',date:'Mar 22, 2025'},
+  ],
+  seo:[
+    {c:'Sterling Auto Care',kw:'auto repair Sterling Heights',pos:3,score:88,ch:'+2'},
+    {c:'Great Lakes Dental',kw:'dentist Macomb County',pos:5,score:82,ch:'+5'},
+    {c:'Sunrise Realty Group',kw:'homes for sale Detroit',pos:9,score:79,ch:'+1'},
+    {c:'Macomb HVAC Pros',kw:'HVAC repair Macomb MI',pos:11,score:74,ch:'+4'},
+    {c:'Detroit Pizza House',kw:'Detroit style pizza',pos:14,score:71,ch:'-1'},
+    {c:'Varsity Law Group',kw:'personal injury lawyer Detroit',pos:18,score:68,ch:'+3'},
+  ],
+  scanLeads:[
+    {n:"Big Mama's Soul Food",t:"Restaurant",a:"Utica, MI",r:"4.6",rv:89,ph:"(586) 441-8822"},
+    {n:"Keller's Auto Glass",t:"Auto Services",a:"Sterling Heights, MI",r:"4.4",rv:156,ph:"(586) 773-0044"},
+    {n:"Sunrise Nail Bar",t:"Beauty",a:"Shelby Township, MI",r:"4.8",rv:212,ph:"(586) 900-1133"},
+    {n:"Champion Concrete",t:"Contractor",a:"Roseville, MI",r:"4.3",rv:44,ph:"(586) 228-7700"},
+    {n:"Royal Garden Florist",t:"Retail",a:"Clinton Township, MI",r:"4.9",rv:178,ph:"(586) 443-9900"},
+    {n:"Precise Plumbing",t:"Plumbing",a:"Warren, MI",r:"4.7",rv:63,ph:"(586) 331-2200"},
+    {n:"The Dog Spot",t:"Pet Services",a:"Sterling Heights, MI",r:"4.9",rv:341,ph:"(586) 771-5566"},
+    {n:"Prime Cuts Barbershop",t:"Beauty",a:"Macomb, MI",r:"4.7",rv:95,ph:"(586) 225-0011"},
+    {n:"Macomb Tire & Wheels",t:"Auto Services",a:"Macomb, MI",r:"4.5",rv:127,ph:"(586) 556-8833"},
+    {n:"Metro Moving Services",t:"Services",a:"Warren, MI",r:"4.6",rv:58,ph:"(586) 441-3300"},
+    {n:"Elite Roofing LLC",t:"Contractor",a:"Utica, MI",r:"4.4",rv:39,ph:"(586) 900-7722"},
+    {n:"Baklava Palace Bakery",t:"Restaurant",a:"Sterling Heights, MI",r:"4.8",rv:203,ph:"(586) 558-4411"},
+    {n:"Eastside Tax Services",t:"Financial",a:"Clinton Township, MI",r:"4.3",rv:29,ph:"(586) 114-8800"},
+    {n:"Quick Dry Cleaners",t:"Services",a:"Roseville, MI",r:"4.5",rv:71,ph:"(586) 229-6600"},
+    {n:"Bloom & Blossom Spa",t:"Beauty",a:"Shelby Township, MI",r:"4.7",rv:189,ph:"(586) 772-4455"},
+    {n:"Oakland Pest Control",t:"Services",a:"Sterling Heights, MI",r:"4.6",rv:47,ph:"(586) 661-3311"},
+    {n:"Macomb Furniture",t:"Retail",a:"Macomb, MI",r:"4.4",rv:82,ph:"(586) 330-0099"},
+    {n:"Riverdale Landscaping",t:"Contractor",a:"Warren, MI",r:"4.5",rv:55,ph:"(586) 221-8833"},
+    {n:"Champ's Sports Bar",t:"Restaurant",a:"Clinton Township, MI",r:"4.2",rv:144,ph:"(586) 441-7700"},
+    {n:"TrueSmile Orthodontics",t:"Medical",a:"Sterling Heights, MI",r:"4.9",rv:267,ph:"(586) 551-3300"},
+  ]
+};
+
+// ─── LOAD LANDING PAGE SIGNUPS FROM LOCALSTORAGE ────────────────────────────
+let landingClients = [];
+let newSignupIds = new Set();
+
+function loadLandingSignups() {
+  try {
+    const raw = localStorage.getItem('grd_new_clients');
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    // Only add ones we haven't seen yet (avoid duplicates on refresh)
+    const seenRaw = localStorage.getItem('grd_seen_ids') || '[]';
+    const seen = new Set(JSON.parse(seenRaw));
+    parsed.forEach(c => {
+      if (!seen.has(c.id)) {
+        landingClients.push(c);
+        newSignupIds.add(c.id);
+      }
+    });
+  } catch(e) {}
+}
+
+function allClients() {
+  return [...seedClients, ...landingClients];
+}
+
+function dismissBanner() {
+  // Mark all current new signups as seen
+  try {
+    const seenRaw = localStorage.getItem('grd_seen_ids') || '[]';
+    const seen = new Set(JSON.parse(seenRaw));
+    newSignupIds.forEach(id => seen.add(id));
+    localStorage.setItem('grd_seen_ids', JSON.stringify([...seen]));
+  } catch(e) {}
+  newSignupIds.clear();
+  document.getElementById('newSignupBanner').style.display = 'none';
+}
+
+// ─── HELPERS ────────────────────────────────────────────────────────────────
+function initials(n){return n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}
+function badge(s){const m={Active:'bg',Paid:'bg',Overdue:'br',Paused:'bx',Pending:'ba',New:'bp',Contacted:'ba',Converted:'bg'};return`<span class="badge ${m[s]||'bx'}">${s}</span>`}
+function planBadge(p){const m={Starter:'bx',Growth:'bb',Pro:'bp',Enterprise:'ba'};return`<span class="badge ${m[p]||'bx'}">${p}</span>`}
+function colorFor(i){return avColors[i%avColors.length]}
+function calcMrr(){return allClients().filter(c=>c.status==='Active').reduce((s,c)=>s+c.mrr,0)}
+
+function chart(cid,lid,data,labels,color){
+  const c=document.getElementById(cid),l=document.getElementById(lid);if(!c)return;
+  const mx=Math.max(...data);
+  c.innerHTML=data.map((v,i)=>{const h=Math.round(v/mx*100);const bg=i===data.length-1?color:color+'66';return`<div class="bar" style="height:${h}%;background:${bg}"><span class="bar-tip">$${v.toLocaleString()}</span></div>`;}).join('');
+  if(l)l.innerHTML=labels.map(lb=>`<span>${lb}</span>`).join('');
+}
+
+// ─── OVERVIEW ────────────────────────────────────────────────────────────────
+function renderOv() {
+  const clients = allClients();
+  const mrr = calcMrr();
+  chart('ovChart','ovLabels',D.rev8,D.mon8,'#1a56db');
+
+  document.getElementById('ovMrr').textContent = '$' + mrr.toLocaleString();
+  document.getElementById('ovMrrDelta').textContent = '&#8593; growing monthly';
+  document.getElementById('ovClients').textContent = clients.filter(c=>c.status==='Active').length;
+  document.getElementById('ovHosted').textContent = clients.length;
+  document.getElementById('ovLeadCount').textContent = D.leads.length;
+
+  // Breakdown
+  const hosting = clients.filter(c=>c.status==='Active').length * 149;
+  const maintenance = clients.filter(c=>c.status==='Active'&&c.services.includes('Maintenance')).length * 80;
+  const seo = clients.filter(c=>c.status==='Active'&&c.services.includes('SEO')).length * 150;
+  const total = hosting + maintenance + seo || 1;
+  document.getElementById('ovBreakdown').innerHTML = [
+    {label:'Hosting',val:hosting,color:'var(--accent)'},
+    {label:'Maintenance',val:maintenance,color:'var(--blue)'},
+    {label:'SEO Packages',val:seo,color:'var(--green)'},
+  ].map(b=>`<div><div style="display:flex;justify-content:space-between;font-size:10.5px;margin-bottom:3px"><span>${b.label}</span><span style="color:${b.color};font-weight:500">$${b.val.toLocaleString()} (${Math.round(b.val/total*100)}%)</span></div><div class="pb"><div class="pf" style="width:${Math.round(b.val/total*100)}%;background:${b.color}"></div></div></div>`).join('');
+
+  // Banner for new signups
+  if (newSignupIds.size > 0) {
+    document.getElementById('newSignupBanner').style.display = 'flex';
+    document.getElementById('newSignupCount').textContent = newSignupIds.size;
+  }
+
+  // Recent clients table — show newest first, landing page signups at top
+  const sorted = [...landingClients].reverse().concat(seedClients.slice(0,4));
+  const tb = document.getElementById('ovTable');
+  if(tb) tb.innerHTML = sorted.slice(0,6).map(c=>`<tr>
+    <td><div class="cr"><div class="av" style="background:${c.color}22;color:${c.color}">${initials(c.name)}</div><div><div class="cn">${c.name}</div><div style="font-size:10px;color:var(--muted)">${c.contact||'—'}</div></div></div></td>
+    <td>${c.source==='Landing Page'?'<span class="source-tag">&#127760; Landing Page</span>':'<span style="font-size:10px;color:var(--muted)">Direct</span>'}</td>
+    <td>${planBadge(c.plan)}</td>
+    <td style="font-weight:500;color:var(--green);font-family:var(--font-mono);font-size:10px">$${c.mrr}/mo</td>
+    <td>${badge(c.status)}</td>
+  </tr>`).join('');
+
+  // Update badges
+  const b = document.getElementById('clientBadge');
+  if(b) b.textContent = clients.length;
+}
+
+function renderRev() {
+  const mrr = calcMrr();
+  chart('revChart','revLabels',D.rev12,D.mon12,'#15803d');
+  document.getElementById('revMrr').textContent = '$' + mrr.toLocaleString();
+  document.getElementById('revArr').textContent = '$' + (mrr*12).toLocaleString();
+  const tb=document.getElementById('invTable');if(!tb)return;
+  tb.innerHTML=D.invoices.map(i=>`<tr>
+    <td style="font-family:var(--font-mono);font-size:10px;color:var(--accent)">${i.id}</td>
+    <td style="font-size:11px">${i.client}</td>
+    <td style="font-weight:500;color:var(--green)">$${i.amt}</td>
+    <td>${badge(i.status)}</td>
+    <td style="color:var(--muted);font-size:10px">${i.date}</td>
+  </tr>`).join('');
+}
+
+function renderClients() {
+  const clients = allClients();
+  const scroll=document.getElementById('clistScroll'),hdr=document.getElementById('clh');if(!scroll)return;
+  hdr.textContent=`All Clients (${clients.length})`;
+  // Landing page signups shown first with green dot
+  const sorted = [...landingClients].reverse().concat(seedClients);
+  scroll.innerHTML=sorted.map((c,i)=>`<div class="cli${i===0?' on':''}" onclick="selClient('${c.id}',this)">
+    <div style="position:relative;flex-shrink:0">
+      <div class="av" style="background:${c.color}22;color:${c.color};width:26px;height:26px;border-radius:5px">${initials(c.name)}</div>
+      ${newSignupIds.has(c.id)?'<div style="position:absolute;top:-2px;right:-2px;width:7px;height:7px;background:var(--green);border-radius:50%;border:1.5px solid var(--surface)"></div>':''}
+    </div>
+    <div style="flex:1;min-width:0"><div class="cli-n">${c.name}</div><div class="cli-p">${c.contact||'—'} · ${c.plan}</div></div>
+    ${badge(c.status)}
+  </div>`).join('');
+  selClient(sorted[0].id, scroll.querySelector('.cli'));
+}
+
+function selClient(id, el) {
+  document.querySelectorAll('.cli').forEach(x=>x.classList.remove('on'));
+  el.classList.add('on');
+  const c = allClients().find(x=>String(x.id)===String(id));
+  if(!c)return;
+  const isNew = newSignupIds.has(c.id);
+  const hasCallback = c.callback && c.callback.date;
+  const callbackDate = hasCallback ? new Date(c.callback.date + 'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}) : null;
+  document.getElementById('cdet').innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <div class="av" style="width:40px;height:40px;border-radius:9px;font-size:14px;background:${c.color}22;color:${c.color}">${initials(c.name)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13.5px;font-weight:500;display:flex;align-items:center;gap:8px">${c.name} ${isNew?'<span class="source-tag">&#127760; New — Landing Page</span>':''}</div>
+        <div style="font-size:10px;color:var(--muted);font-family:var(--font-mono)">${c.domain}</div>
+      </div>
+      <div style="display:flex;gap:5px;flex-shrink:0">${badge(c.status)} ${planBadge(c.plan)}</div>
+    </div>
+    <div class="ds">
+      <div class="dsh">Point of Contact</div>
+      <div class="dr"><span class="dk">Name</span><span style="font-weight:500;font-size:12px;display:flex;align-items:center;gap:6px"><div class="av" style="width:20px;height:20px;border-radius:4px;font-size:9px;background:${c.color}22;color:${c.color}">${initials(c.contact||c.name)}</div>${c.contact||'—'}</span></div>
+      <div class="dr"><span class="dk">Email</span><span class="dv" style="color:var(--accent)">${c.email}</span></div>
+      <div class="dr"><span class="dk">Phone</span><span class="dv">${c.phone}</span></div>
+    </div>
+    <div class="ds">
+      <div class="dsh">Subscription</div>
+      <div class="dr"><span class="dk">Plan</span>${planBadge(c.plan)}</div>
+      <div class="dr"><span class="dk">Monthly Revenue</span><span style="font-size:14px;font-weight:500;color:var(--green)">$${c.mrr}</span></div>
+      <div class="dr"><span class="dk">Services</span><span style="font-size:11px">${c.services}</span></div>
+      <div class="dr"><span class="dk">Client Since</span><span class="dv">${c.joined}</span></div>
+      <div class="dr"><span class="dk">Next Billing</span><span class="dv">${c.next}</span></div>
+      ${c.source==='Landing Page'?`<div class="dr"><span class="dk">Source</span><span class="source-tag">&#127760; Landing Page</span></div>`:''}
+      ${c.note?`<div class="dr" style="flex-direction:column;align-items:flex-start;gap:4px"><span class="dk">Notes</span><span style="font-size:11px;color:var(--muted);line-height:1.5">${c.note}</span></div>`:''}
+      ${c.billingNote?`<div class="dr"><span class="dk">First charge</span><span style="font-size:11px;background:rgba(217,119,6,.08);color:#b45309;padding:2px 8px;border-radius:5px;font-weight:500">${c.billingNote}</span></div>`:''}
+    </div>
+    ${hasCallback?`<div class="ds">
+      <div class="dsh">Scheduled Callback</div>
+      <div class="dr"><span class="dk">Date & Time</span><span style="font-weight:500;font-size:12px">${callbackDate} at ${c.callback.time}</span></div>
+      <div class="dr"><span class="dk">Status</span>
+        <span class="cb-status ${c.callback.status==='confirmed'?'cb-confirmed':c.callback.status==='declined'?'cb-declined':'cb-pending'}">${c.callback.status==='confirmed'?'Confirmed':c.callback.status==='declined'?'Declined':'Pending confirmation'}</span>
+      </div>
+      ${c.callback.status==='pending'?`<div style="display:flex;gap:7px;margin-top:8px">
+        <button class="btn success sm" onclick="confirmCallback('${c.id}')">&#10003; Confirm</button>
+        <button class="btn danger sm" onclick="declineCallback('${c.id}')">&#215; Decline</button>
+      </div>`:''}
+    </div>`:''}
+    <div style="display:flex;gap:7px;margin-top:4px;flex-wrap:wrap">
+      <button class="btn sm">&#9993; Email ${(c.contact||c.name).split(' ')[0]}</button>
+      <button class="btn success sm">&#8593; Upgrade</button>
+      ${isNew?`<button class="btn amber sm" onclick="activateClient('${c.id}')">&#9989; Activate &amp; Set Domain</button>`:''}
+      <button class="btn danger sm">&#215; Cancel</button>
+    </div>`;
+}
+
+function activateClient(id) {
+  const domain = prompt('Enter domain for this client:', 'example.com');
+  if (!domain) return;
+  const c = landingClients.find(x=>String(x.id)===String(id));
+  if (c) { c.domain = domain; c.status = 'Active'; }
+  renderClients();
+  toast('Domain set! Client is now active.');
+}
+
+function renderHosting(){
+  const clients = allClients();
+  const tb=document.getElementById('hostTable');
+  if(tb)tb.innerHTML=clients.map(c=>`<tr>
+    <td style="font-family:var(--font-mono);font-size:10px;color:var(--cyan)">${c.domain}</td>
+    <td style="font-size:11px">${c.name}</td>
+    <td style="color:${c.domain==='pending.com'?'var(--amber)':'var(--green)'};font-size:11px">${c.domain==='pending.com'?'&#9888; Pending':'&#10003; Valid'}</td>
+    <td style="font-weight:500;color:var(--green);font-size:11px">${c.status==='Active'?'99.9%':'—'}</td>
+    <td>${badge(c.status)}</td>
+  </tr>`).join('');
+  const ud=document.getElementById('udots');
+  if(ud){let h='';for(let i=29;i>=0;i--){const ok=Math.random()>.04;const d=new Date();d.setDate(d.getDate()-i);const lbl=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});h+=`<div class="dot" style="background:${ok?'var(--green)':'var(--red)'}" data-tip="${lbl}: ${ok?'100% uptime':'Downtime'}"></div>`;}ud.innerHTML=h;}
+}
+
+function renderSEO(){
+  const tb=document.getElementById('seoTable');if(!tb)return;
+  tb.innerHTML=D.seo.map(s=>`<tr>
+    <td style="font-size:11px">${s.c}</td>
+    <td style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">${s.kw}</td>
+    <td style="font-weight:500;color:${s.pos<=10?'var(--green)':'var(--text)'}">#${s.pos}</td>
+    <td><span style="font-weight:500;font-size:11px">${s.score}</span><div class="seobar"><div class="seofill" style="width:${s.score}%;background:${s.score>80?'var(--green)':s.score>65?'var(--amber)':'var(--red)'}"></div></div></td>
+    <td style="font-weight:500;color:${s.ch.startsWith('+')?'var(--green)':'var(--red)'}">${s.ch}</td>
+    <td>${badge('Active')}</td>
+  </tr>`).join('');
+}
+
+function renderLeadsPage(){
+  const total=D.leads.length,contacted=D.leads.filter(l=>l.status==='Contacted').length,converted=D.leads.filter(l=>l.status==='Converted').length;
+  document.getElementById('lsTotal').textContent=total;
+  document.getElementById('lsContacted').textContent=contacted;
+  document.getElementById('lsConverted').textContent=converted;
+  const container=document.getElementById('leadsList');if(!container)return;
+  if(total===0){container.innerHTML=`<div class="empty-state"><div class="empty-icon">&#127775;</div><div class="empty-txt">No leads yet.<br>Run the Maps Scanner and click "Add Lead".</div></div>`;return;}
+  container.innerHTML=D.leads.map((l,i)=>`
+    <div class="lead-row">
+      <div class="lead-info">
+        <div class="lead-av" style="background:${colorFor(i)}22;color:${colorFor(i)}">${initials(l.name)}</div>
+        <div><div class="lead-name">${l.name}</div><div class="lead-meta">${l.type} &middot; ${l.address} &middot; ${l.phone} &middot; ${l.rating}&#9733; (${l.reviews} reviews)</div></div>
+      </div>
+      <div class="lead-actions">
+        ${badge(l.status)}
+        <button class="btn sm" onclick="openLeadOutreach(${i})">&#9993; Outreach</button>
+        <button class="btn success sm" onclick="setLeadStatus(${i},'Converted')">&#43; Convert</button>
+        <button class="btn danger sm" onclick="removeLead(${i})">&#215;</button>
+      </div>
+    </div>`).join('');
+}
+
+function genEmail(lead, tab){
+  const typeMap={Restaurant:'restaurant','Auto Services':'auto shop',Beauty:'salon',Contractor:'contracting business',Retail:'retail store',Plumbing:'plumbing business','Pet Services':'pet business',Services:'local business',Financial:'tax & financial business',Medical:'practice'};
+  const bt=typeMap[lead.type]||'local business';
+  if(tab==='cold') return `Hi there,\n\nI came across ${lead.name} on Google Maps and was genuinely impressed — ${lead.reviews} reviews and a ${lead.rating}-star rating. That reputation speaks for itself.\n\nI help local ${bt} owners turn that Google presence into a full online presence. Right now, customers searching for "${lead.type.toLowerCase()} near ${lead.address}" may be finding competitors first simply because they have a website.\n\nI build clean, professional websites starting at $149/month — no upfront cost. Includes hosting, monthly maintenance, and local SEO.\n\nI'd love to put together a free mockup for ${lead.name} so you can see exactly what it would look like before committing.\n\nWould a quick 10-minute call work this week?\n\nBest,\n[Your Name]\nGrand River Digital\n[Your Phone]`;
+  if(tab==='followup') return `Hi again,\n\nJust following up on my last message about building a website for ${lead.name}.\n\nI know running a ${bt} keeps you busy — I'll keep this short. I've already sketched a homepage concept for you at no cost.\n\nBusinesses like yours with a professional site typically see 20–30% more new customer inquiries.\n\nHappy to share the mockup — just reply and I'll send it right over.\n\n— [Your Name], Grand River Digital`;
+  return `Hey! This is [Name] from Grand River Digital. I found ${lead.name} on Google Maps — ${lead.reviews} reviews! I build websites for ${bt}s starting at $149/mo, no upfront cost. Mind if I send a free mockup?`;
+}
+
+function goOutreach(){
+  if(!D.currentScanLead)return;
+  const l=D.currentScanLead;
+  D.currentOutreachLead={name:l.n,type:l.t,address:l.a,phone:l.ph,rating:l.r,reviews:l.rv};
+  D.currentOutreachTab='cold';D.prevPage='scanner';
+  renderOutreachDetail();navRaw('outreach-detail');
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+}
+
+function openLeadOutreach(i){
+  D.currentOutreachLead=D.leads[i];D.currentOutreachTab='cold';D.prevPage='leads';
+  renderOutreachDetail();navRaw('outreach-detail');
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+}
+
+function renderOutreachDetail(){
+  const l=D.currentOutreachLead;if(!l)return;
+  const color=avColors[Math.abs(l.name.charCodeAt(0))%avColors.length];
+  document.getElementById('odHeader').innerHTML=`
+    <div class="od-av" style="background:${color}22;color:${color}">${initials(l.name)}</div>
+    <div><div class="od-name">${l.name}</div><div class="od-meta">${l.type} &middot; ${l.address} &middot; ${l.rating}&#9733; &middot; ${l.reviews} reviews &middot; ${l.phone}</div></div>`;
+  document.querySelectorAll('.otab').forEach((t,i)=>{t.classList.toggle('on',i===0)});
+  document.getElementById('emailBody').textContent=genEmail(l,D.currentOutreachTab);
+}
+
+function switchOutreachTab(tab,el){
+  document.querySelectorAll('.otab').forEach(t=>t.classList.remove('on'));el.classList.add('on');
+  D.currentOutreachTab=tab;
+  if(D.currentOutreachLead)document.getElementById('emailBody').textContent=genEmail(D.currentOutreachLead,tab);
+}
+
+function copyCurrentEmail(){
+  const body=document.getElementById('emailBody');
+  if(body)navigator.clipboard.writeText(body.textContent).catch(()=>{});
+  toast('Email copied!');
+}
+
+function addCurrentLeadFromOutreach(){
+  const l=D.currentOutreachLead;if(!l)return;
+  if(D.leads.find(x=>x.name===l.name)){toast('Already in leads');return;}
+  D.leads.push({name:l.name,type:l.type,address:l.address,phone:l.phone,rating:l.rating,reviews:l.reviews,status:'New'});
+  updateLeadBadge();renderOv();toast(l.name+' saved to Leads');
+}
+
+function startScan(){
+  const btn=document.getElementById('scanBtn'),prog=document.getElementById('scanProg'),bar=document.getElementById('pbar'),stat=document.getElementById('sstat');
+  const city=document.getElementById('scCity').value||'your area';
+  const lim=parseInt(document.getElementById('scLim').value);
+  D.currentScanLead=null;btn.disabled=true;btn.textContent='Scanning...';
+  prog.style.display='block';document.getElementById('scanResultsBox').style.display='none';
+  document.getElementById('outreachFooter').classList.add('faded');
+  const steps=[[12,`Connecting to Google Maps for ${city}...`],[28,'Querying business listings...'],[46,'Checking each listing for a website...'],[63,'Filtering results...'],[80,'Scoring by reviews and rating...'],[94,'Building your lead report...'],[100,'Done!']];
+  let i=0;
+  function step(){if(i>=steps.length){setTimeout(()=>{btn.disabled=false;btn.textContent='&#128269; Scan Now';prog.style.display='none';bar.style.width='0%';stat.textContent='';renderScanResults(lim);},400);return;}bar.style.width=steps[i][0]+'%';stat.textContent=steps[i][1];i++;setTimeout(step,500+Math.random()*250);}
+  step();
+}
+
+function renderScanResults(lim){
+  const leads=D.scanLeads.slice(0,lim);
+  document.getElementById('leadCount').textContent=leads.length;
+  document.getElementById('rgrid').innerHTML=leads.map((l,i)=>`
+    <div class="rcard" id="rc${i}" onclick="selectScanLead(${i},this)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px">
+        <div style="min-width:0;flex:1;margin-right:6px"><div class="rbiz">${l.n}</div><div class="rtype">${l.t} &middot; ${l.a}</div></div>
+        <span class="badge bg" style="flex-shrink:0">No website</span>
+      </div>
+      <div class="rmeta"><span class="rt g">${l.r}&#9733;</span><span class="rt">${l.rv} reviews</span><span class="rt">${l.ph}</span></div>
+      <div class="ract">
+        <button class="btn success sm" onclick="event.stopPropagation();addLeadDirect(${i})">+ Add Lead</button>
+        <button class="btn sm" onclick="event.stopPropagation();quickCopy(${i})">&#9993; Copy Email</button>
+      </div>
+    </div>`).join('');
+  document.getElementById('scanResultsBox').style.display='block';
+}
+
+function selectScanLead(i,el){
+  document.querySelectorAll('.rcard').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');
+  D.currentScanLead=D.scanLeads[i];
+  const footer=document.getElementById('outreachFooter');footer.classList.remove('faded');
+  document.getElementById('ofSelName').textContent=D.currentScanLead.n+' — '+D.currentScanLead.t;
+}
+
+function addLeadDirect(i){
+  const l=D.scanLeads[i];
+  if(D.leads.find(x=>x.name===l.n)){toast(l.n+' already in leads');return;}
+  D.leads.push({name:l.n,type:l.t,address:l.a,phone:l.ph,rating:l.r,reviews:l.rv,status:'New'});
+  updateLeadBadge();renderOv();toast(l.n+' added to Leads');
+}
+
+function quickCopy(i){
+  const l=D.scanLeads[i];
+  navigator.clipboard.writeText(genEmail({name:l.n,type:l.t,address:l.a,rating:l.r,reviews:l.rv},'cold')).catch(()=>{});
+  toast('Email copied!');
+}
+
+function exportCSV(){
+  const rows=['Business,Type,Address,Rating,Reviews,Phone',...D.scanLeads.map(l=>`"${l.n}","${l.t}","${l.a}","${l.r}",${l.rv},"${l.ph}"`)].join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(rows);a.download='grandriverdigital-leads.csv';a.click();
+}
+
+function setLeadStatus(i,s){D.leads[i].status=s;renderLeadsPage();toast('Status updated')}
+function removeLead(i){D.leads.splice(i,1);updateLeadBadge();renderLeadsPage();renderOv();}
+function updateLeadBadge(){const b=document.getElementById('leadBadge');if(b)b.textContent=D.leads.length;}
+
+
+function renderCallbacks() {
+  const all = [...landingClients, ...seedClients].filter(c => c.callback && c.callback.date);
+  const pending = all.filter(c => c.callback.status === 'pending');
+  const badge = document.getElementById('callbackBadge');
+  if (badge) { badge.textContent = pending.length; badge.style.display = pending.length > 0 ? 'inline-flex' : 'none'; }
+  const container = document.getElementById('callbacksList');
+  if (!container) return;
+  if (all.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">&#128197;</div><div class="empty-txt">No callbacks scheduled yet.</div></div>';
+    return;
+  }
+  const sorted = [...all].sort((a,b) => a.callback.date.localeCompare(b.callback.date));
+  container.innerHTML = sorted.map(c => {
+    const dateDisp = new Date(c.callback.date + 'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+    const statusClass = c.callback.status === 'confirmed' ? 'cb-confirmed' : c.callback.status === 'declined' ? 'cb-declined' : 'cb-pending';
+    const statusLabel = c.callback.status === 'confirmed' ? '&#10003; Confirmed' : c.callback.status === 'declined' ? 'Declined' : '&#9679; Pending';
+    return `<div class="cb-card">
+      <div class="cb-header">
+        <div class="av" style="background:${c.color}22;color:${c.color};width:34px;height:34px;border-radius:8px;font-size:12px;font-weight:600;flex-shrink:0">${initials(c.name)}</div>
+        <div class="cb-info">
+          <div class="cb-name">${c.contact || c.name}</div>
+          <div class="cb-biz">${c.name} &middot; ${c.phone}</div>
+          <div class="cb-time">&#128197; ${dateDisp} &nbsp; &#128336; ${c.callback.time} &nbsp; <span class="cb-status ${statusClass}">${statusLabel}</span></div>
+          ${c.billingNote ? `<div class="billing-note">&#9432; ${c.billingNote}</div>` : ''}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
+          ${planBadge(c.plan)}
+        </div>
+      </div>
+      ${c.callback.status === 'pending' ? `<div class="cb-actions">
+        <button class="btn success sm" onclick="confirmCallback('${c.id}')">&#10003; Confirm call</button>
+        <button class="btn danger sm" onclick="declineCallback('${c.id}')">&#215; Decline & free slot</button>
+        <button class="btn sm" onclick="openLeadOutreach(${D.leads.indexOf(D.leads.find(l=>l.name===c.name))})">&#9993; Send outreach email</button>
+      </div>` : `<div style="font-size:11px;color:var(--muted)">${c.callback.status === 'confirmed' ? 'Call is confirmed. Add to your calendar and prepare.' : 'Slot has been freed. Client was notified.'}</div>`}
+    </div>`;
+  }).join('');
+}
+
+function confirmCallback(id) {
+  const c = [...landingClients, ...seedClients].find(x => String(x.id) === String(id));
+  if (!c || !c.callback) return;
+  c.callback.status = 'confirmed';
+  // Update localStorage
+  try {
+    const raw = JSON.parse(localStorage.getItem('grd_new_clients') || '[]');
+    const idx = raw.findIndex(x => String(x.id) === String(id));
+    if (idx >= 0) { raw[idx].callback.status = 'confirmed'; localStorage.setItem('grd_new_clients', JSON.stringify(raw)); }
+  } catch(_) {}
+  renderCallbacks();
+  if (document.getElementById('pg-clients').classList.contains('on')) renderClients();
+  toast('Callback confirmed for ' + c.contact);
+}
+
+function declineCallback(id) {
+  const c = [...landingClients, ...seedClients].find(x => String(x.id) === String(id));
+  if (!c || !c.callback) return;
+  c.callback.status = 'declined';
+  // Free the slot in booked_slots
+  try {
+    const slots = JSON.parse(localStorage.getItem('grd_booked_slots') || '{}');
+    if (slots[c.callback.date] && slots[c.callback.date][c.callback.time]) {
+      slots[c.callback.date][c.callback.time].status = 'declined';
+      localStorage.setItem('grd_booked_slots', JSON.stringify(slots));
+    }
+    const raw = JSON.parse(localStorage.getItem('grd_new_clients') || '[]');
+    const idx = raw.findIndex(x => String(x.id) === String(id));
+    if (idx >= 0) { raw[idx].callback.status = 'declined'; localStorage.setItem('grd_new_clients', JSON.stringify(raw)); }
+  } catch(_) {}
+  renderCallbacks();
+  if (document.getElementById('pg-clients').classList.contains('on')) renderClients();
+  toast('Slot freed — client can re-book');
+}
+
+const pageTitles={callbacks:'Callback Requests',overview:'Dashboard',revenue:'Revenue Tracking',clients:'Client Management',hosting:'Hosting Metrics',seo:'SEO Tracker',scanner:'Maps Business Scanner',leads:'Leads Pipeline','outreach-detail':'Outreach'};
+
+function navRaw(pg){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.getElementById('pg-'+pg).classList.add('on');
+  document.getElementById('ttl').textContent=pageTitles[pg]||pg;
+  document.getElementById('mainScroll').scrollTop=0;
+  document.getElementById('backBtn').classList.toggle('show',pg==='outreach-detail');
+}
+
+function nav(pg,el){
+  D.prevPage=null;navRaw(pg);
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  if(el)el.classList.add('on');
+  if(pg==='clients')renderClients();
+  if(pg==='hosting')renderHosting();
+  if(pg==='seo')renderSEO();
+  if(pg==='leads')renderLeadsPage();
+  if(pg==='callbacks')renderCallbacks();
+}
+
+function goBack(){
+  const dest=D.prevPage||'scanner';
+  const nbMap={scanner:5,leads:6};
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  const nbs=document.querySelectorAll('.nb');
+  if(nbMap[dest]!==undefined&&nbs[nbMap[dest]])nbs[nbMap[dest]].classList.add('on');
+  navRaw(dest);if(dest==='leads')renderLeadsPage();
+}
+
+function openModal(){document.getElementById('modal').classList.add('on')}
+function closeModal(){document.getElementById('modal').classList.remove('on')}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal()});
+
+function addClientManual(){
+  const n=document.getElementById('mn').value.trim();
+  if(!n){alert('Please enter a business name.');return;}
+  const planMap={Starter:149,Growth:299,Pro:499,Enterprise:799};
+  const plan=document.getElementById('mpl').value;
+  const today=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  seedClients.push({
+    id:Date.now(),name:n,
+    contact:document.getElementById('mcn').value||'—',
+    domain:document.getElementById('md').value||'pending.com',
+    email:document.getElementById('me').value||'—',
+    phone:document.getElementById('mp').value||'—',
+    plan,mrr:planMap[plan]||149,status:'Active',
+    services:document.getElementById('msv').value,
+    joined:today,next:'—',
+    color:colorFor(seedClients.length),
+    source:'Direct'
+  });
+  closeModal();['mn','mcn','me','mp','md'].forEach(id=>document.getElementById(id).value='');
+  if(document.getElementById('pg-clients').classList.contains('on'))renderClients();
+  renderOv();toast(n+' added successfully!');
+}
+
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2500);}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+loadLandingSignups();
+renderOv();
+renderRev();
+renderCallbacks();
+</script>
+</body>
+</html>

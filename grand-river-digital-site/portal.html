@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grand River Digital — Client Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f4f1;
+  --surface: #ffffff;
+  --surface2: #f0efe9;
+  --surface3: #e8e7e0;
+  --border: rgba(0,0,0,0.07);
+  --border2: rgba(0,0,0,0.13);
+  --text: #18181a;
+  --muted: #6b6b6a;
+  --hint: #a0a09a;
+  --accent: #1a56db;
+  --green: #15803d;
+  --green-bg: #f0fdf4;
+  --amber: #b45309;
+  --amber-bg: #fffbeb;
+  --red: #b91c1c;
+  --red-bg: #fef2f2;
+  --blue: #1d4ed8;
+  --blue-bg: #eff6ff;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* ── LOGIN ── */
+.login-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: var(--bg);
+}
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  padding: 44px 40px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 40px rgba(0,0,0,0.06);
+}
+.login-logo {
+  font-family: 'Bebas Neue', 'DM Sans', sans-serif;
+  font-size: 26px;
+  letter-spacing: 3px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+.login-logo-badge {
+  background: var(--accent);
+  color: #fff;
+  font-size: 9px;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 1px;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+.login-title { font-size: 20px; font-weight: 500; margin-bottom: 6px; }
+.login-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.field label { font-size: 12px; font-weight: 500; color: var(--muted); }
+.field input {
+  padding: 11px 14px;
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+  transition: border-color .15s;
+}
+.field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(26,86,219,0.1); }
+.login-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all .15s;
+  margin-top: 8px;
+}
+.login-btn:hover { background: #1d4ed8; }
+.login-demo { text-align: center; margin-top: 20px; font-size: 12px; color: var(--muted); }
+.login-demo button {
+  color: var(--accent); background: none; border: none; cursor: pointer;
+  font-size: 12px; font-family: 'DM Sans', sans-serif; text-decoration: underline;
+}
+.login-error { color: var(--red); font-size: 12px; margin-top: 8px; display: none; }
+
+/* ── PORTAL ── */
+.portal { display: none; }
+
+/* TOP BAR */
+.portal-nav {
+  height: 58px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.portal-logo {
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  color: var(--text);
+}
+.portal-nav-divider { width: 1px; height: 20px; background: var(--border2); }
+.portal-client-name { font-size: 14px; font-weight: 500; flex: 1; }
+.portal-client-name span { color: var(--muted); font-weight: 400; }
+.portal-nav-actions { display: flex; align-items: center; gap: 10px; }
+.portal-avatar {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600;
+}
+.btn-sm {
+  padding: 6px 14px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  transition: all .12s;
+}
+.btn-sm:hover { background: var(--surface2); color: var(--text); }
+
+/* MAIN LAYOUT */
+.portal-body { max-width: 960px; margin: 0 auto; padding: 32px 24px; }
+
+/* WELCOME */
+.welcome-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.welcome-title { font-size: 22px; font-weight: 500; }
+.welcome-sub { font-size: 13px; color: var(--muted); margin-top: 3px; }
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.status-pill.active { background: var(--green-bg); color: var(--green); border: 1px solid rgba(21,128,61,.15); }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+/* STATS ROW */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.stat-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+.stat-lbl { font-size: 11px; color: var(--muted); font-weight: 500; margin-bottom: 6px; }
+.stat-val { font-size: 22px; font-weight: 500; line-height: 1.1; }
+.stat-delta { font-size: 11px; margin-top: 4px; }
+.up { color: var(--green); } .neu { color: var(--muted); }
+
+/* GRID */
+.portal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.full-width { grid-column: 1 / -1; }
+
+/* CARD */
+.pcard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.pcard-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.pcard-title { font-size: 13px; font-weight: 500; }
+.pcard-body { padding: 16px 18px; }
+
+/* BADGE */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 9px; border-radius: 99px;
+  font-size: 10px; font-weight: 500;
+}
+.badge-green { background: var(--green-bg); color: var(--green); }
+.badge-amber { background: var(--amber-bg); color: var(--amber); }
+.badge-red { background: var(--red-bg); color: var(--red); }
+.badge-blue { background: var(--blue-bg); color: var(--blue); }
+.badge-gray { background: var(--surface2); color: var(--muted); }
+
+/* UPTIME DOTS */
+.uptime-row { display: flex; gap: 3px; flex-wrap: wrap; }
+.udot { width: 11px; height: 11px; border-radius: 2px; cursor: pointer; position: relative; }
+.udot:hover::after {
+  content: attr(data-tip);
+  position: absolute; top: -26px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--text); color: var(--surface);
+  font-size: 9px; padding: 3px 7px; border-radius: 4px;
+  white-space: nowrap; z-index: 10;
+}
+
+/* INVOICE TABLE */
+.inv-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.inv-row:last-child { border-bottom: none; }
+.inv-id { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent); }
+.inv-amt { font-weight: 500; }
+
+/* SEO TABLE */
+.seo-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+.seo-row:last-child { border-bottom: none; }
+.seo-kw { flex: 1; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; }
+.seo-pos { font-weight: 600; min-width: 28px; }
+.seo-bar { height: 3px; width: 60px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+.seo-fill { height: 100%; border-radius: 99px; }
+.seo-ch { font-weight: 600; min-width: 28px; text-align: right; }
+
+/* SUPPORT */
+.support-form { display: flex; flex-direction: column; gap: 12px; }
+.sf-row { display: flex; gap: 10px; }
+.sf-input, .sf-select, .sf-textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border2);
+  border-radius: 7px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+  transition: border-color .15s;
+}
+.sf-input:focus, .sf-select:focus, .sf-textarea:focus { border-color: var(--accent); }
+.sf-textarea { resize: vertical; min-height: 80px; }
+.sf-btn {
+  padding: 10px 20px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  align-self: flex-start;
+  transition: all .15s;
+}
+.sf-btn:hover { background: #1d4ed8; }
+
+/* CONTACT CARD */
+.contact-info { display: flex; flex-direction: column; gap: 14px; }
+.contact-row { display: flex; align-items: center; gap: 12px; }
+.contact-icon {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+.contact-key { font-size: 11px; color: var(--muted); }
+.contact-val { font-size: 13px; font-weight: 500; }
+
+/* PROGRESS BAR */
+.pbar { height: 5px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+.pfill { height: 100%; border-radius: 99px; transition: width .4s ease; }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 20px; right: 20px;
+  background: var(--text); color: var(--surface);
+  padding: 10px 18px; border-radius: 8px;
+  font-size: 12px; font-weight: 500;
+  z-index: 999; opacity: 0; transition: opacity .25s;
+  pointer-events: none;
+}
+.toast.on { opacity: 1; }
+
+@media (max-width: 640px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .portal-grid { grid-template-columns: 1fr; }
+  .portal-nav { padding: 0 16px; }
+  .portal-body { padding: 20px 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <div class="login-logo">GRAND RIVER <span class="login-logo-badge">GRD CLIENT PORTAL</span></div>
+    <div class="login-title">Welcome back</div>
+    <div class="login-sub">Sign in to view your Grand River Digital website performance, invoices, and more.</div>
+    <div class="field">
+      <label>Email address</label>
+      <input type="email" id="loginEmail" placeholder="you@yourbusiness.com" value="mike@sterlingautocare.com">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="••••••••" value="password">
+    </div>
+    <div class="login-error" id="loginError">Invalid email or password. Try the demo login.</div>
+    <button class="login-btn" onclick="doLogin()">Sign in →</button>
+    <div class="login-demo">
+      <span style="color:var(--muted)">Try the demo — </span>
+      <button onclick="demoLogin()">click to auto-fill &amp; login</button>
+    </div>
+  </div>
+</div>
+
+<!-- PORTAL -->
+<div class="portal" id="portal">
+
+  <nav class="portal-nav">
+    <div class="portal-logo">GRAND RIVER</div>
+    <div class="portal-nav-divider"></div>
+    <div class="portal-client-name" id="portalClientName">Loading...</div>
+    <div class="portal-nav-actions">
+      <div class="portal-avatar" id="portalAvatar" style="background:#1a56db22;color:#1a56db"></div>
+      <button class="btn-sm" onclick="logout()">Sign out</button>
+    </div>
+  </nav>
+
+  <div class="portal-body">
+
+    <div class="welcome-row">
+      <div>
+        <div class="welcome-title" id="welcomeTitle">Good morning</div>
+        <div class="welcome-sub" id="welcomeSub">Here's your website overview for March 2026</div>
+      </div>
+      <div class="status-pill active"><div class="status-dot" style="background:var(--green)"></div>Site is live</div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-lbl">MONTHLY VISITORS</div>
+        <div class="stat-val" id="sVisitors">—</div>
+        <div class="stat-delta up" id="sVisitorsDelta">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-lbl">GOOGLE RANKING</div>
+        <div class="stat-val" id="sRanking">—</div>
+        <div class="stat-delta" id="sRankingDelta">—</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-lbl">UPTIME THIS MONTH</div>
+        <div class="stat-val" style="color:var(--green)">99.9%</div>
+        <div class="stat-delta neu">No downtime</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-lbl">CURRENT PLAN</div>
+        <div class="stat-val" style="font-size:18px" id="sPlan">—</div>
+        <div class="stat-delta neu" id="sMrr">—</div>
+      </div>
+    </div>
+
+    <div class="portal-grid">
+
+      <!-- Website & Hosting -->
+      <div class="pcard">
+        <div class="pcard-header">
+          <div class="pcard-title">Website &amp; Hosting</div>
+          <span class="badge badge-green">Live</span>
+        </div>
+        <div class="pcard-body">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Domain</span><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent)" id="infoDomain">—</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">SSL Certificate</span><span style="color:var(--green)">✓ Valid</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Last backup</span><span>Today, 3:00 AM</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Next maintenance</span><span>Apr 1, 2026</span></div>
+          </div>
+          <div style="margin-top:16px">
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:6px"><span>Storage used</span><span>2.1 GB / 10 GB</span></div>
+            <div class="pbar"><div class="pfill" style="width:21%;background:var(--accent)"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEO Rankings -->
+      <div class="pcard">
+        <div class="pcard-header">
+          <div class="pcard-title">SEO Rankings</div>
+          <span class="badge badge-green">Improving</span>
+        </div>
+        <div class="pcard-body">
+          <div id="seoRows"></div>
+        </div>
+      </div>
+
+      <!-- Uptime History -->
+      <div class="pcard full-width">
+        <div class="pcard-header">
+          <div class="pcard-title">30-Day Uptime History</div>
+          <span style="font-size:11px;color:var(--muted)">Each square = 1 day</span>
+        </div>
+        <div class="pcard-body">
+          <div class="uptime-row" id="uptimeRow"></div>
+          <div style="display:flex;gap:16px;margin-top:12px;font-size:11px;color:var(--muted)">
+            <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#15803d;margin-right:5px;vertical-align:middle"></span>100% uptime</span>
+            <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#b91c1c;margin-right:5px;vertical-align:middle"></span>Downtime detected</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Invoices -->
+      <div class="pcard">
+        <div class="pcard-header">
+          <div class="pcard-title">Recent Invoices</div>
+        </div>
+        <div class="pcard-body">
+          <div id="invoiceList"></div>
+        </div>
+      </div>
+
+      <!-- Support -->
+      <div class="pcard">
+        <div class="pcard-header">
+          <div class="pcard-title">Submit a Request</div>
+        </div>
+        <div class="pcard-body">
+          <div class="support-form">
+            <select class="sf-select">
+              <option>Content update request</option>
+              <option>New page needed</option>
+              <option>Bug / something looks wrong</option>
+              <option>SEO question</option>
+              <option>Billing question</option>
+              <option>Other</option>
+            </select>
+            <textarea class="sf-textarea" placeholder="Describe what you need — we'll get back to you within 24 hours..."></textarea>
+            <button class="sf-btn" onclick="submitRequest()">Send request →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Your Account Manager -->
+      <div class="pcard full-width">
+        <div class="pcard-header">
+          <div class="pcard-title">Your Account Manager</div>
+        </div>
+        <div class="pcard-body">
+          <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+            <div style="width:52px;height:52px;border-radius:12px;background:#1a56db22;color:#1a56db;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;flex-shrink:0">WC</div>
+            <div style="flex:1">
+              <div style="font-size:15px;font-weight:500">Grand River Digital Support Team</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px">Sterling Heights, MI · Typically responds within 2 hours</div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <a href="tel:+15860000000" style="text-decoration:none"><button class="btn-sm" style="border-color:#1a56db;color:#1a56db">📞 Call us</button></a>
+              <a href="/cdn-cgi/l/email-protection#fc9499909093bc8b999e9f8e9d9a88d29d9b99929f85" style="text-decoration:none"><button class="btn-sm">✉ Email us</button></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+const clients = {
+  'mike@sterlingautocare.com': {
+    name:'Mike Caruso', biz:'Sterling Auto Care', domain:'sterlingautocare.com',
+    plan:'Pro', mrr:499, color:'#1a56db',
+    visitors:847, visitorsDelta:'↑ 34% vs last month',
+    ranking:'#3', rankingDelta:'↑ 2 positions', rankingColor:'var(--green)',
+    seo:[
+      {kw:'auto repair sterling heights',pos:3,score:88,ch:'+2'},
+      {kw:'oil change near me',pos:6,score:82,ch:'+4'},
+      {kw:'tire shop macomb county',pos:11,score:74,ch:'+1'},
+    ],
+    invoices:[
+      {id:'INV-042',desc:'Pro Plan – March 2026',amt:499,status:'Paid',date:'Mar 1, 2026'},
+      {id:'INV-039',desc:'Pro Plan – Feb 2026',amt:499,status:'Paid',date:'Feb 1, 2026'},
+      {id:'INV-036',desc:'Pro Plan – Jan 2026',amt:499,status:'Paid',date:'Jan 1, 2026'},
+    ]
+  },
+  'dr.smith@greatlakes.com': {
+    name:'Dr. Karen Smith', biz:'Great Lakes Dental', domain:'greatlakesdental.com',
+    plan:'Pro', mrr:499, color:'#2563eb',
+    visitors:612, visitorsDelta:'↑ 18% vs last month',
+    ranking:'#5', rankingDelta:'↑ 5 positions', rankingColor:'var(--green)',
+    seo:[
+      {kw:'dentist macomb county',pos:5,score:82,ch:'+5'},
+      {kw:'family dentist near me',pos:9,score:76,ch:'+2'},
+      {kw:'teeth cleaning sterling heights',pos:14,score:68,ch:'+3'},
+    ],
+    invoices:[
+      {id:'INV-038',desc:'Pro Plan – March 2026',amt:499,status:'Paid',date:'Mar 1, 2026'},
+      {id:'INV-035',desc:'Pro Plan – Feb 2026',amt:499,status:'Paid',date:'Feb 1, 2026'},
+    ]
+  },
+  'bella@bellahair.com': {
+    name:'Bella Russo', biz:'Bella Hair Studio', domain:'bellahairstudio.com',
+    plan:'Starter', mrr:149, color:'#ec4899',
+    visitors:224, visitorsDelta:'↑ 8% vs last month',
+    ranking:'#18', rankingDelta:'New listing', rankingColor:'var(--muted)',
+    seo:[
+      {kw:'hair salon sterling heights',pos:18,score:61,ch:'+1'},
+      {kw:'balayage near me',pos:24,score:55,ch:'new'},
+    ],
+    invoices:[
+      {id:'INV-041',desc:'Starter Plan – March 2026',amt:149,status:'Overdue',date:'Mar 1, 2026'},
+      {id:'INV-038',desc:'Starter Plan – Feb 2026',amt:149,status:'Paid',date:'Feb 1, 2026'},
+    ]
+  }
+};
+
+let currentClient = null;
+
+function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginError');
+  const client = clients[email];
+  if (!client || pass.length < 1) {
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+  currentClient = client;
+  loadPortal(client);
+}
+
+function demoLogin() {
+  document.getElementById('loginEmail').value = 'mike@sterlingautocare.com';
+  document.getElementById('loginPass').value = 'password';
+  doLogin();
+}
+
+function logout() {
+  document.getElementById('portal').style.display = 'none';
+  document.getElementById('loginWrap').style.display = 'flex';
+  currentClient = null;
+}
+
+function loadPortal(c) {
+  document.getElementById('loginWrap').style.display = 'none';
+  document.getElementById('portal').style.display = 'block';
+
+  const hr = new Date().getHours();
+  const greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('welcomeTitle').textContent = greet + ', ' + c.name.split(' ')[0] + '.';
+  document.getElementById('welcomeSub').textContent = 'Here\'s your website overview for ' + c.biz;
+  document.getElementById('portalClientName').innerHTML = c.biz + ' <span>/ Client Portal</span>';
+  document.getElementById('infoDomain').textContent = c.domain;
+  document.getElementById('sPlan').textContent = c.plan;
+  document.getElementById('sMrr').textContent = '$' + c.mrr + '/month';
+  document.getElementById('sVisitors').textContent = c.visitors.toLocaleString();
+  document.getElementById('sVisitorsDelta').textContent = c.visitorsDelta;
+  document.getElementById('sVisitorsDelta').className = 'stat-delta up';
+  document.getElementById('sRanking').textContent = c.ranking;
+  document.getElementById('sRankingDelta').textContent = c.rankingDelta;
+  document.getElementById('sRankingDelta').style.color = c.rankingColor;
+  const av = document.getElementById('portalAvatar');
+  av.textContent = c.name.split(' ').map(w=>w[0]).join('').slice(0,2);
+  av.style.background = c.color + '22';
+  av.style.color = c.color;
+
+  // SEO rows
+  const seoEl = document.getElementById('seoRows');
+  seoEl.innerHTML = c.seo.map(s => `
+    <div class="seo-row">
+      <span class="seo-pos" style="color:${s.pos<=10?'var(--green)':'var(--text)'}">#${s.pos}</span>
+      <span class="seo-kw">${s.kw}</span>
+      <div class="seo-bar"><div class="seo-fill" style="width:${s.score}%;background:${s.score>80?'#15803d':s.score>65?'#b45309':'#b91c1c'}"></div></div>
+      <span class="seo-ch" style="color:${s.ch.startsWith('+')?'var(--green)':'var(--muted)'}">${s.ch}</span>
+    </div>`).join('');
+
+  // Uptime dots
+  const ud = document.getElementById('uptimeRow');
+  let h = '';
+  for(let i=29;i>=0;i--) {
+    const ok = Math.random() > 0.03;
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const lbl = d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    h += `<div class="udot" style="background:${ok?'#15803d':'#b91c1c'}" data-tip="${lbl}: ${ok?'100% uptime':'Downtime'}"></div>`;
+  }
+  ud.innerHTML = h;
+
+  // Invoices
+  const statusMap = {Paid:'badge-green',Overdue:'badge-red',Pending:'badge-amber'};
+  const invEl = document.getElementById('invoiceList');
+  invEl.innerHTML = c.invoices.map(inv => `
+    <div class="inv-row">
+      <div>
+        <div class="inv-id">${inv.id}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">${inv.desc}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="inv-amt">$${inv.amt}</span>
+        <span class="badge ${statusMap[inv.status]||'badge-gray'}">${inv.status}</span>
+        <button class="btn-sm" onclick="downloadInvoice('${inv.id}')">PDF</button>
+      </div>
+    </div>`).join('');
+}
+
+function submitRequest() {
+  toast('Request submitted — we\'ll be in touch within 24 hours!');
+}
+
+function downloadInvoice(id) {
+  toast(id + ' — PDF download would open here');
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('on');
+  setTimeout(() => t.classList.remove('on'), 3000);
+}
+
+// Auto-demo on load for preview purposes
+window.addEventListener('load', () => {
+  document.get
