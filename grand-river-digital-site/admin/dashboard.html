@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WebCraft — Agency Dashboard</title>
+<title>Grand River Digital — GRD Dashboard</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -222,7 +222,7 @@ tr:last-child td{border-bottom:none}
 <div class="sb">
   <div class="sb-logo">
     <div class="sb-icon">&#9889;</div>
-    <div><div class="sb-brand">WebCraft</div><div class="sb-tagline">Agency Dashboard</div></div>
+    <div><div class="sb-brand">Grand River Digital</div><div class="sb-tagline">GRD Dashboard</div></div>
   </div>
   <nav class="sb-nav">
     <div class="sb-sec">Overview</div>
@@ -240,7 +240,7 @@ tr:last-child td{border-bottom:none}
     <button class="nb" onclick="nav('settings',this)"><span class="ico">&#9881;</span>Settings</button>
   </nav>
   <div class="sb-foot">
-    <div class="plan-pill"><div class="pl">Agency Plan</div><div class="pn">Pro Unlimited &#10022;</div></div>
+    <div class="plan-pill"><div class="pl">Agency Plan</div><div class="pn">GRD Pro &#10022;</div></div>
   </div>
 </div>
 
@@ -816,9 +816,9 @@ function renderLeadsPage(){
 function genEmail(lead, tab){
   const typeMap={Restaurant:'restaurant','Auto Services':'auto shop',Beauty:'salon',Contractor:'contracting business',Retail:'retail store',Plumbing:'plumbing business','Pet Services':'pet business',Services:'local business',Financial:'tax & financial business',Medical:'practice'};
   const bt=typeMap[lead.type]||'local business';
-  if(tab==='cold') return `Hi there,\n\nI came across ${lead.name} on Google Maps and was genuinely impressed — ${lead.reviews} reviews and a ${lead.rating}-star rating. That reputation speaks for itself.\n\nI help local ${bt} owners turn that Google presence into a full online presence. Right now, customers searching for "${lead.type.toLowerCase()} near ${lead.address}" may be finding competitors first simply because they have a website.\n\nI build clean, professional websites starting at $149/month — no upfront cost. Includes hosting, monthly maintenance, and local SEO.\n\nI'd love to put together a free mockup for ${lead.name} so you can see exactly what it would look like before committing.\n\nWould a quick 10-minute call work this week?\n\nBest,\n[Your Name]\nWebCraft Agency\n[Your Phone]`;
-  if(tab==='followup') return `Hi again,\n\nJust following up on my last message about building a website for ${lead.name}.\n\nI know running a ${bt} keeps you busy — I'll keep this short. I've already sketched a homepage concept for you at no cost.\n\nBusinesses like yours with a professional site typically see 20–30% more new customer inquiries.\n\nHappy to share the mockup — just reply and I'll send it right over.\n\n— [Your Name], WebCraft Agency`;
-  return `Hey! This is [Name] from WebCraft Agency. I found ${lead.name} on Google Maps — ${lead.reviews} reviews! I build websites for ${bt}s starting at $149/mo, no upfront cost. Mind if I send a free mockup?`;
+  if(tab==='cold') return `Hi there,\n\nI came across ${lead.name} on Google Maps and was genuinely impressed — ${lead.reviews} reviews and a ${lead.rating}-star rating. That reputation speaks for itself.\n\nI help local ${bt} owners turn that Google presence into a full online presence. Right now, customers searching for "${lead.type.toLowerCase()} near ${lead.address}" may be finding competitors first simply because they have a website.\n\nI build clean, professional websites starting at $149/month — no upfront cost. Includes hosting, monthly maintenance, and local SEO.\n\nI'd love to put together a free mockup for ${lead.name} so you can see exactly what it would look like before committing.\n\nWould a quick 10-minute call work this week?\n\nBest,\n[Your Name]\nGrand River Digital\n[Your Phone]`;
+  if(tab==='followup') return `Hi again,\n\nJust following up on my last message about building a website for ${lead.name}.\n\nI know running a ${bt} keeps you busy — I'll keep this short. I've already sketched a homepage concept for you at no cost.\n\nBusinesses like yours with a professional site typically see 20–30% more new customer inquiries.\n\nHappy to share the mockup — just reply and I'll send it right over.\n\n— [Your Name], Grand River Digital`;
+  return `Hey! This is [Name] from Grand River Digital. I found ${lead.name} on Google Maps — ${lead.reviews} reviews! I build websites for ${bt}s starting at $149/mo, no upfront cost. Mind if I send a free mockup?`;
 }
 
 function goOutreach(){
