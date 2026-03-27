@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grand River Digital — GRD Dashboard</title>
+<title>WebCraft — Agency Dashboard</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -164,17 +164,53 @@ tr:last-child td{border-bottom:none}
 .empty-icon{font-size:26px;margin-bottom:8px}
 .empty-txt{font-size:11.5px;line-height:1.6}
 
+/* NEW SIGNUPS BANNER */
+.new-banner{background:rgba(21,128,61,.08);border:0.5px solid rgba(21,128,61,.25);border-radius:var(--border-radius-md);padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.new-banner-text{font-size:12px;color:var(--green);font-weight:500}
+.new-banner-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.new-badge{background:var(--green);color:#fff;font-size:9px;padding:2px 7px;border-radius:99px;font-weight:600;margin-left:6px}
+
+/* SOURCE TAG */
+.source-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;background:rgba(21,128,61,.08);color:var(--green);border:0.5px solid rgba(21,128,61,.2);border-radius:4px;padding:1px 6px}
+
+.moverlay{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:50}
+.moverlay.on{display:flex}
+.modal{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--border-radius-lg);padding:20px;width:400px;max-width:90%}
+.mttl{font-size:14px;font-weight:500;margin-bottom:3px}
+.msub{font-size:11px;color:var(--muted);margin-bottom:16px}
+.mform{display:flex;flex-direction:column;gap:10px}
+.fg{display:flex;flex-direction:column;gap:4px}
+.flbl{font-size:10px;color:var(--muted);font-weight:500}
+.fi{background:var(--surface2);border:0.5px solid var(--border2);color:var(--text);padding:7px 9px;border-radius:6px;font-size:11.5px;font-family:var(--font-sans);outline:none;width:100%}
+.fi:focus{border-color:var(--accent)}
+.mact{display:flex;justify-content:flex-end;gap:7px;margin-top:14px}
+.g2f{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--text);color:var(--surface);padding:7px 14px;border-radius:6px;font-size:11px;font-weight:500;z-index:99;opacity:0;transition:opacity .25s;pointer-events:none}
+.toast.on{opacity:1}
+
+.cb-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:10px}
+.cb-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.cb-info{flex:1}
+.cb-name{font-size:13px;font-weight:500}
+.cb-biz{font-size:11px;color:var(--muted);margin-top:1px}
+.cb-time{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:12px}
+.cb-status{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:500}
+.cb-pending{background:rgba(217,119,6,.1);color:var(--amber)}
+.cb-confirmed{background:rgba(21,128,61,.1);color:var(--green)}
+.cb-declined{background:rgba(220,38,38,.08);color:var(--red)}
+.cb-actions{display:flex;gap:7px;flex-wrap:wrap}
+.billing-note{font-size:10.5px;background:rgba(217,119,6,.07);border:0.5px solid rgba(217,119,6,.2);border-radius:5px;padding:5px 9px;color:var(--amber);margin-top:6px}
+</style>
+</head>
+<body>
+<script>
 /* WebCraft Admin Auth Guard */
 (function() {
   var stored = sessionStorage.getItem('grd_admin');
-  if (!stored) {
-    window.location.replace('index.html');
-    return;
-  }
-  // Validate against saved creds (or default if none saved)
+  if (!stored) { window.location.replace('index.html'); return; }
   var DEFAULT = '18bbbec8bd46ee18b107b185aaea73ef6e0c8e7db524f821d1b3c96d51c8a03a';
-  var creds;
-  try { creds = JSON.parse(localStorage.getItem('grd_owner_creds') || 'null'); } catch(e) { creds = null; }
+  var creds = null;
+  try { creds = JSON.parse(localStorage.getItem('grd_owner_creds') || 'null'); } catch(e) {}
   var validHash = (creds && creds.hash) ? creds.hash : DEFAULT;
   if (stored !== validHash) {
     sessionStorage.removeItem('grd_admin');
@@ -186,7 +222,7 @@ tr:last-child td{border-bottom:none}
 <div class="sb">
   <div class="sb-logo">
     <div class="sb-icon">&#9889;</div>
-    <div><div class="sb-brand">Grand River Digital</div><div class="sb-tagline">GRD Dashboard</div></div>
+    <div><div class="sb-brand">WebCraft</div><div class="sb-tagline">Agency Dashboard</div></div>
   </div>
   <nav class="sb-nav">
     <div class="sb-sec">Overview</div>
@@ -212,9 +248,7 @@ tr:last-child td{border-bottom:none}
   <div class="topbar">
     <button class="back-btn" id="backBtn" onclick="goBack()">&#8592; Back</button>
     <div class="tb-title" id="ttl">Dashboard</div>
-    <a href="../index.html" style="font-size:11px;color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;border:0.5px solid var(--border2);margin-right:4px">&#8592; Site</a>
-    <button onclick="doLogout();" style="font-size:11px;color:var(--muted);background:none;border:0.5px solid var(--border2);border-radius:5px;padding:4px 9px;cursor:pointer;font-family:var(--font-sans);margin-right:8px">Log out</button>
-    <div class="tb-live"><span class="live-dot"></span>All systems live</div>
+    <a href="../index.html" style="font-size:11px;color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;border:0.5px solid var(--border2);margin-right:4px">&#8592; Site</a><button onclick="doLogout()" style="font-size:11px;color:var(--muted);background:none;border:0.5px solid var(--border2);border-radius:5px;padding:4px 9px;cursor:pointer;font-family:var(--font-sans);margin-right:8px">Log out</button><div class="tb-live"><span class="live-dot"></span>All systems live</div>
     <button class="btn primary sm" onclick="openModal()">+ Add Client</button>
   </div>
   <div class="scroll" id="mainScroll">
@@ -284,7 +318,7 @@ tr:last-child td{border-bottom:none}
         <div class="clh" id="clh">All Clients</div>
         <div class="clist-scroll" id="clistScroll"></div>
       </div>
-      <div class="cdet" id="cdet"><div class="empty-state"><div class="empty-icon">&#127881;</div><div class="empty-txt">No clients yet.<br>Your first signup will appear here.</div></div></div>
+      <div class="cdet" id="cdet"><div class="empty-state"><div class="empty-icon">&#128101;</div><div class="empty-txt">Select a client</div></div></div>
     </div>
   </div>
 
@@ -329,21 +363,9 @@ tr:last-child td{border-bottom:none}
       <div class="ct" style="font-size:14px;margin-bottom:3px">&#128506; Google Maps Business Scanner</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Find local businesses without websites &mdash; your next clients</div>
       <div class="sform">
-        <div class="sfg"><label class="slbl">Location / City</label><input class="sinput" id="scCity" value="Sterling Heights, MI" placeholder="City, State"></div>
+        <div class="sfg"><label class="slbl">Location / City</label><input class="sinput" id="scCity" value="Sterling Heights, MI"></div>
         <div class="sfg"><label class="slbl">Business Type</label>
-          <select class="ssel" id="scType">
-                  <option>All businesses</option>
-                  <option>Restaurants &amp; Food</option>
-                  <option>Auto Repair Shops</option>
-                  <option>Plumbers &amp; HVAC</option>
-                  <option>Hair &amp; Beauty Salons</option>
-                  <option>Retail Stores</option>
-                  <option>Contractors</option>
-                  <option>Medical &amp; Dental</option>
-                  <option>Pet Services</option>
-                  <option>Law Firms</option>
-                  <option>Gym &amp; Fitness</option>
-                </select>
+          <select class="ssel" id="scType"><option>All businesses</option><option>Restaurants &amp; Food</option><option>Auto Repair Shops</option><option>Plumbers &amp; HVAC</option><option>Hair &amp; Beauty Salons</option><option>Retail Stores</option><option>Contractors</option><option>Medical &amp; Dental</option><option>Pet Services</option><option>Law Firms</option></select>
         </div>
         <div class="sfg" style="max-width:88px"><label class="slbl">Radius (mi)</label>
           <select class="ssel" id="scRad"><option>5</option><option selected>10</option><option>25</option><option>50</option></select>
@@ -391,7 +413,7 @@ tr:last-child td{border-bottom:none}
     </div>
     <div class="card">
       <div class="ch"><div class="ct">All Leads</div></div>
-      <div id="leadsList"><div class="empty-state"><div class="empty-icon">&#127775;</div><div class="empty-txt">No leads yet.<br>Use the Maps Scanner to find local businesses without websites.</div></div></div>
+      <div id="leadsList"><div class="empty-state"><div class="empty-icon">&#127775;</div><div class="empty-txt">No leads yet.<br>Run the Maps Scanner and click "Add Lead".</div></div></div>
     </div>
   </div>
 
@@ -412,8 +434,6 @@ tr:last-child td{border-bottom:none}
     <div style="max-width:520px">
       <div style="font-size:14px;font-weight:500;margin-bottom:4px">Account Settings</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:24px">Update your login email and password</div>
-
-      <!-- Current credentials display -->
       <div class="card" style="margin-bottom:14px;padding:16px">
         <div style="font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">Current Login</div>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--border)">
@@ -425,8 +445,6 @@ tr:last-child td{border-bottom:none}
           <span style="font-size:12px;color:var(--muted)">&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;</span>
         </div>
       </div>
-
-      <!-- Update Email -->
       <div class="card" style="margin-bottom:14px;padding:16px">
         <div style="font-size:12.5px;font-weight:500;margin-bottom:12px">Update Email</div>
         <div class="fg" style="margin-bottom:10px">
@@ -440,8 +458,6 @@ tr:last-child td{border-bottom:none}
         <button class="btn primary sm" onclick="updateEmail()">Update Email</button>
         <div id="emailMsg" style="font-size:11.5px;margin-top:8px;display:none"></div>
       </div>
-
-      <!-- Update Password -->
       <div class="card" style="margin-bottom:14px;padding:16px">
         <div style="font-size:12.5px;font-weight:500;margin-bottom:12px">Change Password</div>
         <div class="fg" style="margin-bottom:10px">
@@ -459,16 +475,13 @@ tr:last-child td{border-bottom:none}
         <button class="btn primary sm" onclick="updatePassword()">Change Password</button>
         <div id="pwMsg" style="font-size:11.5px;margin-top:8px;display:none"></div>
       </div>
-
-      <!-- Danger zone -->
-      <div class="card" style="padding:16px;border-color:rgba(220,38,38,.2)">
+      <div class="card" style="padding:16px;border:0.5px solid rgba(220,38,38,.2)">
         <div style="font-size:12.5px;font-weight:500;margin-bottom:6px;color:var(--red)">Sign out</div>
         <div style="font-size:11.5px;color:var(--muted);margin-bottom:12px">You will need your email and password to sign back in.</div>
         <button class="btn danger sm" onclick="doLogout()">Sign out of Dashboard</button>
       </div>
     </div>
   </div>
-
   <!-- OUTREACH DETAIL -->
   <div class="pg" id="pg-outreach-detail">
     <div class="card">
@@ -533,8 +546,6 @@ const D = {
   currentScanLead: null,
   currentOutreachLead: null,
   currentOutreachTab: 'cold',
-  scanResults: [],
-  scanResultsAll: [],
   prevPage: null,
   rev8:[0,0,0,0,0,0,0,0],mon8:['Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'],
   rev12:[0,0,0,0,0,0,0,0,0,0,0,0],mon12:['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'],
@@ -545,7 +556,22 @@ const D = {
     {n:"Keller's Auto Glass",t:"Auto Services",a:"Sterling Heights, MI",r:"4.4",rv:156,ph:"(586) 773-0044"},
     {n:"Sunrise Nail Bar",t:"Beauty",a:"Shelby Township, MI",r:"4.8",rv:212,ph:"(586) 900-1133"},
     {n:"Champion Concrete",t:"Contractor",a:"Roseville, MI",r:"4.3",rv:44,ph:"(586) 228-7700"},
-    {n:"Royal Garden Florist",t:"Retail",a:"Clinton Township, MI",r:"4.9",rv:178,ph:"(586) 443-9900"}
+    {n:"Royal Garden Florist",t:"Retail",a:"Clinton Township, MI",r:"4.9",rv:178,ph:"(586) 443-9900"},
+    {n:"Precise Plumbing",t:"Plumbing",a:"Warren, MI",r:"4.7",rv:63,ph:"(586) 331-2200"},
+    {n:"The Dog Spot",t:"Pet Services",a:"Sterling Heights, MI",r:"4.9",rv:341,ph:"(586) 771-5566"},
+    {n:"Prime Cuts Barbershop",t:"Beauty",a:"Macomb, MI",r:"4.7",rv:95,ph:"(586) 225-0011"},
+    {n:"Macomb Tire & Wheels",t:"Auto Services",a:"Macomb, MI",r:"4.5",rv:127,ph:"(586) 556-8833"},
+    {n:"Metro Moving Services",t:"Services",a:"Warren, MI",r:"4.6",rv:58,ph:"(586) 441-3300"},
+    {n:"Elite Roofing LLC",t:"Contractor",a:"Utica, MI",r:"4.4",rv:39,ph:"(586) 900-7722"},
+    {n:"Baklava Palace Bakery",t:"Restaurant",a:"Sterling Heights, MI",r:"4.8",rv:203,ph:"(586) 558-4411"},
+    {n:"Eastside Tax Services",t:"Financial",a:"Clinton Township, MI",r:"4.3",rv:29,ph:"(586) 114-8800"},
+    {n:"Quick Dry Cleaners",t:"Services",a:"Roseville, MI",r:"4.5",rv:71,ph:"(586) 229-6600"},
+    {n:"Bloom & Blossom Spa",t:"Beauty",a:"Shelby Township, MI",r:"4.7",rv:189,ph:"(586) 772-4455"},
+    {n:"Oakland Pest Control",t:"Services",a:"Sterling Heights, MI",r:"4.6",rv:47,ph:"(586) 661-3311"},
+    {n:"Macomb Furniture",t:"Retail",a:"Macomb, MI",r:"4.4",rv:82,ph:"(586) 330-0099"},
+    {n:"Riverdale Landscaping",t:"Contractor",a:"Warren, MI",r:"4.5",rv:55,ph:"(586) 221-8833"},
+    {n:"Champ's Sports Bar",t:"Restaurant",a:"Clinton Township, MI",r:"4.2",rv:144,ph:"(586) 441-7700"},
+    {n:"TrueSmile Orthodontics",t:"Medical",a:"Sterling Heights, MI",r:"4.9",rv:267,ph:"(586) 551-3300"},
   ]
 };
 
@@ -771,7 +797,7 @@ function renderLeadsPage(){
   document.getElementById('lsContacted').textContent=contacted;
   document.getElementById('lsConverted').textContent=converted;
   const container=document.getElementById('leadsList');if(!container)return;
-  if(total===0){container.innerHTML=`<div class="empty-state"><div class="empty-icon">&#127775;</div><div class="empty-txt">No leads yet.<br>Use the Maps Scanner to find local businesses without websites.</div></div>`;return;}
+  if(total===0){container.innerHTML=`<div class="empty-state"><div class="empty-icon">&#127775;</div><div class="empty-txt">No leads yet.<br>Run the Maps Scanner and click "Add Lead".</div></div>`;return;}
   container.innerHTML=D.leads.map((l,i)=>`
     <div class="lead-row">
       <div class="lead-info">
@@ -790,9 +816,9 @@ function renderLeadsPage(){
 function genEmail(lead, tab){
   const typeMap={Restaurant:'restaurant','Auto Services':'auto shop',Beauty:'salon',Contractor:'contracting business',Retail:'retail store',Plumbing:'plumbing business','Pet Services':'pet business',Services:'local business',Financial:'tax & financial business',Medical:'practice'};
   const bt=typeMap[lead.type]||'local business';
-  if(tab==='cold') return `Hi there,\n\nI came across ${lead.name} on Google Maps and was genuinely impressed — ${lead.reviews} reviews and a ${lead.rating}-star rating. That reputation speaks for itself.\n\nI help local ${bt} owners turn that Google presence into a full online presence. Right now, customers searching for "${lead.type.toLowerCase()} near ${lead.address}" may be finding competitors first simply because they have a website.\n\nI build clean, professional websites starting at $149/month — no upfront cost. Includes hosting, monthly maintenance, and local SEO.\n\nI'd love to put together a free mockup for ${lead.name} so you can see exactly what it would look like before committing.\n\nWould a quick 10-minute call work this week?\n\nBest,\n[Your Name]\nGrand River Digital\n[Your Phone]`;
-  if(tab==='followup') return `Hi again,\n\nJust following up on my last message about building a website for ${lead.name}.\n\nI know running a ${bt} keeps you busy — I'll keep this short. I've already sketched a homepage concept for you at no cost.\n\nBusinesses like yours with a professional site typically see 20–30% more new customer inquiries.\n\nHappy to share the mockup — just reply and I'll send it right over.\n\n— [Your Name], Grand River Digital`;
-  return `Hey! This is [Name] from Grand River Digital. I found ${lead.name} on Google Maps — ${lead.reviews} reviews! I build websites for ${bt}s starting at $149/mo, no upfront cost. Mind if I send a free mockup?`;
+  if(tab==='cold') return `Hi there,\n\nI came across ${lead.name} on Google Maps and was genuinely impressed — ${lead.reviews} reviews and a ${lead.rating}-star rating. That reputation speaks for itself.\n\nI help local ${bt} owners turn that Google presence into a full online presence. Right now, customers searching for "${lead.type.toLowerCase()} near ${lead.address}" may be finding competitors first simply because they have a website.\n\nI build clean, professional websites starting at $149/month — no upfront cost. Includes hosting, monthly maintenance, and local SEO.\n\nI'd love to put together a free mockup for ${lead.name} so you can see exactly what it would look like before committing.\n\nWould a quick 10-minute call work this week?\n\nBest,\n[Your Name]\nWebCraft Agency\n[Your Phone]`;
+  if(tab==='followup') return `Hi again,\n\nJust following up on my last message about building a website for ${lead.name}.\n\nI know running a ${bt} keeps you busy — I'll keep this short. I've already sketched a homepage concept for you at no cost.\n\nBusinesses like yours with a professional site typically see 20–30% more new customer inquiries.\n\nHappy to share the mockup — just reply and I'll send it right over.\n\n— [Your Name], WebCraft Agency`;
+  return `Hey! This is [Name] from WebCraft Agency. I found ${lead.name} on Google Maps — ${lead.reviews} reviews! I build websites for ${bt}s starting at $149/mo, no upfront cost. Mind if I send a free mockup?`;
 }
 
 function goOutreach(){
@@ -840,140 +866,59 @@ function addCurrentLeadFromOutreach(){
 }
 
 function startScan(){
-  const btn  = document.getElementById('scanBtn');
-  const prog = document.getElementById('scanProg');
-  const bar  = document.getElementById('pbar');
-  const stat = document.getElementById('sstat');
-  const city = document.getElementById('scCity').value || 'Sterling Heights, MI';
-  const type = document.getElementById('scType').value;
-  const rad  = parseInt(document.getElementById('scRad').value) * 1609; // miles to meters
-  const lim  = parseInt(document.getElementById('scLim').value);
-
-  D.currentScanLead = null;
-  btn.disabled = true;
-  btn.textContent = 'Scanning...';
-  prog.style.display = 'block';
-  document.getElementById('scanResultsBox').style.display = 'none';
+  const btn=document.getElementById('scanBtn'),prog=document.getElementById('scanProg'),bar=document.getElementById('pbar'),stat=document.getElementById('sstat');
+  const city=document.getElementById('scCity').value||'your area';
+  const lim=parseInt(document.getElementById('scLim').value);
+  D.currentScanLead=null;btn.disabled=true;btn.textContent='Scanning...';
+  prog.style.display='block';document.getElementById('scanResultsBox').style.display='none';
   document.getElementById('outreachFooter').classList.add('faded');
-
-  // Animate progress while we wait for the API
-  const steps = [
-    [15, 'Connecting to Google Maps\u2026'],
-    [35, 'Searching ' + city + '\u2026'],
-    [55, 'Checking each listing for a website\u2026'],
-    [75, 'Filtering results\u2026'],
-    [90, 'Almost done\u2026'],
-  ];
-  let si = 0;
-  const ticker = setInterval(() => {
-    if (si < steps.length) {
-      bar.style.width  = steps[si][0] + '%';
-      stat.textContent = steps[si][1];
-      si++;
-    }
-  }, 800);
-
-  // Call our Netlify function
-  const params = new URLSearchParams({ city, type, radius: rad, limit: lim });
-  fetch('/.netlify/functions/scanner?' + params.toString())
-    .then(r => r.json())
-    .then(data => {
-      clearInterval(ticker);
-      bar.style.width  = '100%';
-      stat.textContent = 'Done!';
-      setTimeout(() => {
-        btn.disabled = false;
-        btn.textContent = '\uD83D\uDD0D Scan Now';
-        prog.style.display = 'none';
-        bar.style.width = '0%';
-        stat.textContent = '';
-        if (data.error) {
-          alert('Scanner error: ' + data.error);
-          return;
-        }
-        D.scanResults = data.leads || [];
-        D.scanResultsAll = [...(data.leads || []), ...(data.has_website || [])];
-        renderScanResults(data);
-      }, 500);
-    })
-    .catch(err => {
-      clearInterval(ticker);
-      btn.disabled = false;
-      btn.textContent = '\uD83D\uDD0D Scan Now';
-      prog.style.display = 'none';
-      alert('Could not reach scanner. Make sure the Netlify function is deployed.\n\n' + err.message);
-    });
+  const steps=[[12,`Connecting to Google Maps for ${city}...`],[28,'Querying business listings...'],[46,'Checking each listing for a website...'],[63,'Filtering results...'],[80,'Scoring by reviews and rating...'],[94,'Building your lead report...'],[100,'Done!']];
+  let i=0;
+  function step(){if(i>=steps.length){setTimeout(()=>{btn.disabled=false;btn.textContent='&#128269; Scan Now';prog.style.display='none';bar.style.width='0%';stat.textContent='';renderScanResults(lim);},400);return;}bar.style.width=steps[i][0]+'%';stat.textContent=steps[i][1];i++;setTimeout(step,500+Math.random()*250);}
+  step();
 }
 
-function renderScanResults(data){
-  const leads = data.leads || [];
-  const total = data.total_scanned || leads.length;
-
-  document.getElementById('leadCount').textContent = leads.length;
-  document.getElementById('scanResultsBox').style.display = 'block';
-
-  // Update the results header
-  const lc = document.getElementById('leadCount');
-  if (lc) lc.textContent = leads.length;
-
-  // Show summary line
-  const subEl = document.querySelector('#scanResultsBox .card div div:nth-child(2)');
-
-  if (leads.length === 0) {
-    document.getElementById('rgrid').innerHTML = `
-      <div style="grid-column:1/-1;text-align:center;padding:32px 20px;color:var(--muted)">
-        <div style="font-size:24px;margin-bottom:8px">\uD83D\uDD0D</div>
-        <div style="font-size:13px">No businesses without websites found in this area.<br>Try a different city, business type, or larger radius.</div>
-      </div>`;
-    return;
-  }
-
-  document.getElementById('rgrid').innerHTML = leads.map((l, i) => `
+function renderScanResults(lim){
+  const leads=D.scanLeads.slice(0,lim);
+  document.getElementById('leadCount').textContent=leads.length;
+  document.getElementById('rgrid').innerHTML=leads.map((l,i)=>`
     <div class="rcard" id="rc${i}" onclick="selectScanLead(${i},this)">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
-        <div style="min-width:0;flex:1;margin-right:6px">
-          <div class="rbiz">${l.name}</div>
-          <div class="rtype">${l.type} &middot; ${l.address}</div>
-        </div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px">
+        <div style="min-width:0;flex:1;margin-right:6px"><div class="rbiz">${l.n}</div><div class="rtype">${l.t} &middot; ${l.a}</div></div>
         <span class="badge bg" style="flex-shrink:0">No website</span>
       </div>
-      <div class="rmeta">
-        ${l.rating !== 'N/A' ? `<span class="rt g">${l.rating}&#9733;</span>` : ''}
-        ${l.reviews > 0 ? `<span class="rt">${l.reviews} reviews</span>` : ''}
-        ${l.phone !== 'Not listed' ? `<span class="rt">${l.phone}</span>` : '<span class="rt" style="color:var(--red)">No phone listed</span>'}
-      </div>
-      <div class="ract" style="margin-top:8px">
+      <div class="rmeta"><span class="rt g">${l.r}&#9733;</span><span class="rt">${l.rv} reviews</span><span class="rt">${l.ph}</span></div>
+      <div class="ract">
         <button class="btn success sm" onclick="event.stopPropagation();addLeadDirect(${i})">+ Add Lead</button>
         <button class="btn sm" onclick="event.stopPropagation();quickCopy(${i})">&#9993; Copy Email</button>
-        ${l.phone !== 'Not listed' ? `<a href="tel:${l.phone}" class="btn sm" onclick="event.stopPropagation()" style="text-decoration:none">&#128222; Call</a>` : ''}
       </div>
     </div>`).join('');
+  document.getElementById('scanResultsBox').style.display='block';
 }
-
 
 function selectScanLead(i,el){
   document.querySelectorAll('.rcard').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');
-  D.currentScanLead=(D.scanResults||D.scanLeads||[])[i];
+  D.currentScanLead=D.scanLeads[i];
   const footer=document.getElementById('outreachFooter');footer.classList.remove('faded');
   document.getElementById('ofSelName').textContent=D.currentScanLead.n+' — '+D.currentScanLead.t;
 }
 
 function addLeadDirect(i){
-  const l=(D.scanResults||D.scanLeads||[])[i];
+  const l=D.scanLeads[i];
   if(D.leads.find(x=>x.name===l.n)){toast(l.n+' already in leads');return;}
   D.leads.push({name:l.n,type:l.t,address:l.a,phone:l.ph,rating:l.r,reviews:l.rv,status:'New'});
   updateLeadBadge();renderOv();toast(l.n+' added to Leads');
 }
 
 function quickCopy(i){
-  const l=(D.scanResults||D.scanLeads||[])[i];
+  const l=D.scanLeads[i];
   navigator.clipboard.writeText(genEmail({name:l.n,type:l.t,address:l.a,rating:l.r,reviews:l.rv},'cold')).catch(()=>{});
   toast('Email copied!');
 }
 
 function exportCSV(){
-  const rows=['Business,Type,Address,Rating,Reviews,Phone,...(D.scanResults||D.scanLeads||[]).map(l=>`"${l.n}","${l.t}","${l.a}","${l.r}",${l.rv},"${l.ph}"`)].join('\n');
-  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(rows);a.download='grandriverdigital-leads.csv';a.click();
+  const rows=['Business,Type,Address,Rating,Reviews,Phone',...D.scanLeads.map(l=>`"${l.n}","${l.t}","${l.a}","${l.r}",${l.rv},"${l.ph}"`)].join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(rows);a.download='webcraft-leads.csv';a.click();
 }
 
 function setLeadStatus(i,s){D.leads[i].status=s;renderLeadsPage();toast('Status updated')}
@@ -1054,85 +999,7 @@ function declineCallback(id) {
   toast('Slot freed — client can re-book');
 }
 
-
-/* ── SETTINGS ── */
-async function sha256(str) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-}
-
-function getOwnerCreds() {
-  try {
-    const raw = localStorage.getItem('grd_owner_creds');
-    if (raw) return JSON.parse(raw);
-  } catch(_) {}
-  return { email: 'admin', hash: sessionStorage.getItem('grd_admin'), isDefault: true };
-}
-
-function loadSettingsDisplay() {
-  const creds = getOwnerCreds();
-  const el = document.getElementById('settingsEmail');
-  if (el) el.textContent = creds.email || 'Not set';
-}
-
-async function updateEmail() {
-  const newEmail = document.getElementById('settingsNewEmail').value.trim();
-  const confirmPw = document.getElementById('settingsEmailConfirmPw').value;
-  const msg = document.getElementById('emailMsg');
-
-  if (!newEmail || !newEmail.includes('@')) { showSettingsMsg('emailMsg', 'Please enter a valid email.', 'error'); return; }
-  if (!confirmPw) { showSettingsMsg('emailMsg', 'Please enter your current password to confirm.', 'error'); return; }
-
-  const creds = getOwnerCreds();
-  const hash = await sha256(confirmPw);
-  if (hash !== creds.hash) { showSettingsMsg('emailMsg', 'Incorrect password.', 'error'); return; }
-
-  localStorage.setItem('grd_owner_creds', JSON.stringify({ ...creds, email: newEmail.toLowerCase() }));
-  sessionStorage.setItem('grd_owner_email', newEmail.toLowerCase());
-  loadSettingsDisplay();
-  document.getElementById('settingsNewEmail').value = '';
-  document.getElementById('settingsEmailConfirmPw').value = '';
-  showSettingsMsg('emailMsg', 'Email updated successfully.', 'success');
-}
-
-async function updatePassword() {
-  const currentPw  = document.getElementById('settingsCurrentPw').value;
-  const newPw      = document.getElementById('settingsNewPw').value;
-  const confirmPw  = document.getElementById('settingsConfirmPw').value;
-
-  if (!currentPw) { showSettingsMsg('pwMsg', 'Please enter your current password.', 'error'); return; }
-  if (newPw.length < 8) { showSettingsMsg('pwMsg', 'New password must be at least 8 characters.', 'error'); return; }
-  if (newPw !== confirmPw) { showSettingsMsg('pwMsg', 'Passwords do not match.', 'error'); return; }
-
-  const creds = getOwnerCreds();
-  const currentHash = await sha256(currentPw);
-  if (currentHash !== creds.hash) { showSettingsMsg('pwMsg', 'Current password is incorrect.', 'error'); return; }
-
-  const newHash = await sha256(newPw);
-  localStorage.setItem('grd_owner_creds', JSON.stringify({ ...creds, hash: newHash, isDefault: false }));
-  sessionStorage.setItem('grd_admin', newHash);
-  document.getElementById('settingsCurrentPw').value = '';
-  document.getElementById('settingsNewPw').value = '';
-  document.getElementById('settingsConfirmPw').value = '';
-  showSettingsMsg('pwMsg', 'Password changed successfully.', 'success');
-}
-
-function showSettingsMsg(id, msg, type) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.textContent = msg;
-  el.style.display = 'block';
-  el.style.color = type === 'success' ? 'var(--green)' : 'var(--red)';
-  setTimeout(() => el.style.display = 'none', 4000);
-}
-
-function doLogout() {
-  sessionStorage.removeItem('grd_admin');
-  sessionStorage.removeItem('grd_owner_email');
-  window.location.href = 'index.html';
-}
-
-const pageTitles={callbacks:'Callback Requests',settings:'Settings',overview:'Dashboard',revenue:'Revenue Tracking',clients:'Client Management',hosting:'Hosting Metrics',seo:'SEO Tracker',scanner:'Maps Business Scanner',leads:'Leads Pipeline','outreach-detail':'Outreach'};
+const pageTitles={callbacks:'Callback Requests',overview:'Dashboard',revenue:'Revenue Tracking',clients:'Client Management',hosting:'Hosting Metrics',seo:'SEO Tracker',scanner:'Maps Business Scanner',leads:'Leads Pipeline','outreach-detail':'Outreach'};
 
 function navRaw(pg){
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
@@ -1150,8 +1017,8 @@ function nav(pg,el){
   if(pg==='hosting')renderHosting();
   if(pg==='seo')renderSEO();
   if(pg==='leads')renderLeadsPage();
-  if(pg==='callbacks')renderCallbacks();
   if(pg==='settings')loadSettingsDisplay();
+  if(pg==='callbacks')renderCallbacks();
 }
 
 function goBack(){
@@ -1193,6 +1060,75 @@ function addClientManual(){
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2500);}
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
+
+/* ── SETTINGS & AUTH ── */
+function doLogout() {
+  sessionStorage.removeItem('grd_admin');
+  window.location.href = 'index.html';
+}
+
+async function sha256dash(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function getOwnerCreds() {
+  try {
+    const raw = localStorage.getItem('grd_owner_creds');
+    if (raw) return JSON.parse(raw);
+  } catch(_) {}
+  return { email: 'admin', hash: sessionStorage.getItem('grd_admin') };
+}
+
+function loadSettingsDisplay() {
+  const creds = getOwnerCreds();
+  const el = document.getElementById('settingsEmail');
+  if (el) el.textContent = creds.email || 'Not set';
+}
+
+async function updateEmail() {
+  const newEmail  = document.getElementById('settingsNewEmail').value.trim();
+  const confirmPw = document.getElementById('settingsEmailConfirmPw').value;
+  if (!newEmail || !newEmail.includes('@')) { showSettingsMsg('emailMsg','Please enter a valid email.','error'); return; }
+  if (!confirmPw) { showSettingsMsg('emailMsg','Please enter your current password.','error'); return; }
+  const creds = getOwnerCreds();
+  const hash  = await sha256dash(confirmPw);
+  if (hash !== creds.hash) { showSettingsMsg('emailMsg','Incorrect password.','error'); return; }
+  localStorage.setItem('grd_owner_creds', JSON.stringify({...creds, email: newEmail.toLowerCase()}));
+  loadSettingsDisplay();
+  document.getElementById('settingsNewEmail').value = '';
+  document.getElementById('settingsEmailConfirmPw').value = '';
+  showSettingsMsg('emailMsg','Email updated successfully.','success');
+}
+
+async function updatePassword() {
+  const currentPw = document.getElementById('settingsCurrentPw').value;
+  const newPw     = document.getElementById('settingsNewPw').value;
+  const confirmPw = document.getElementById('settingsConfirmPw').value;
+  if (!currentPw) { showSettingsMsg('pwMsg','Please enter your current password.','error'); return; }
+  if (newPw.length < 8) { showSettingsMsg('pwMsg','New password must be at least 8 characters.','error'); return; }
+  if (newPw !== confirmPw) { showSettingsMsg('pwMsg','Passwords do not match.','error'); return; }
+  const creds       = getOwnerCreds();
+  const currentHash = await sha256dash(currentPw);
+  if (currentHash !== creds.hash) { showSettingsMsg('pwMsg','Current password is incorrect.','error'); return; }
+  const newHash = await sha256dash(newPw);
+  localStorage.setItem('grd_owner_creds', JSON.stringify({...creds, hash: newHash, isDefault: false}));
+  sessionStorage.setItem('grd_admin', newHash);
+  document.getElementById('settingsCurrentPw').value = '';
+  document.getElementById('settingsNewPw').value = '';
+  document.getElementById('settingsConfirmPw').value = '';
+  showSettingsMsg('pwMsg','Password changed successfully.','success');
+}
+
+function showSettingsMsg(id, msg, type) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.color = type === 'success' ? 'var(--green)' : 'var(--red)';
+  setTimeout(() => el.style.display = 'none', 4000);
+}
+
 loadLandingSignups();
 renderOv();
 renderRev();
