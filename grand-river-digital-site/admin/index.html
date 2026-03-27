@@ -54,6 +54,11 @@ h2{font-size:16px;font-weight:600;color:#111827;margin-bottom:4px}
     <div class="err" id="loginErr"></div>
     <hr class="divider">
     <div class="hint">Not linked on the public site.<br>Bookmark this page after signing in.</div>
+    <div style="margin-top:12px;text-align:center">
+      <button onclick="resetCreds()" style="background:none;border:none;font-size:10px;color:#d1d5db;cursor:pointer;font-family:inherit;text-decoration:underline">
+        Locked out? Reset credentials
+      </button>
+    </div>
   </div>
 
   <!-- STEP 2: FIRST LOGIN — SET CREDENTIALS -->
@@ -176,6 +181,14 @@ function doSetup() {
     }));
     enterDashboard(hash);
   });
+}
+
+function resetCreds() {
+  if (confirm('This will reset your login to the default password (grd2026admin). Continue?')) {
+    localStorage.removeItem('grd_owner_creds');
+    sessionStorage.removeItem('grd_admin');
+    location.reload();
+  }
 }
 
 // Clear any stale session on gate load to prevent loops
