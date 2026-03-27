@@ -165,15 +165,19 @@ tr:last-child td{border-bottom:none}
 .empty-txt{font-size:11.5px;line-height:1.6}
 
 /* WebCraft Admin Auth Guard */
-(function(){
-  // Read the current valid hash from localStorage (set during login)
-  // Falls back to the default hash if no custom creds have been saved yet
+(function() {
+  var stored = sessionStorage.getItem('grd_admin');
+  if (!stored) {
+    window.location.replace('index.html');
+    return;
+  }
+  // Validate against saved creds (or default if none saved)
   var DEFAULT = '18bbbec8bd46ee18b107b185aaea73ef6e0c8e7db524f821d1b3c96d51c8a03a';
-  var stored  = sessionStorage.getItem('grd_admin');
   var creds;
-  try { creds = JSON.parse(localStorage.getItem('grd_owner_creds') || '{}'); } catch(e) { creds = {}; }
+  try { creds = JSON.parse(localStorage.getItem('grd_owner_creds') || 'null'); } catch(e) { creds = null; }
   var validHash = (creds && creds.hash) ? creds.hash : DEFAULT;
-  if (!stored || stored !== validHash) {
+  if (stored !== validHash) {
+    sessionStorage.removeItem('grd_admin');
     window.location.replace('index.html');
   }
 })();
