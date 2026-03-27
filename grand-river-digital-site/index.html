@@ -975,7 +975,18 @@ select.cf-input { cursor: pointer; }
     <a href="portal.html" target="_blank">Client Login</a>
     <a href="/cdn-cgi/l/email-protection#2c44494040436c4b5e4d42485e455a495e48454b45584d40024f4341"><span class="__cf_email__" data-cfemail="a0c8c5cccccfe0c7d2c1cec4d2c9d6c5d2c4c9c7c9d4c1cc8ec3cfcd">[email&#160;protected]</span></a>
   </div>
-  <div class="footer-copy">© 2026 Grand River Digital &nbsp;·&nbsp; Metro Detroit, MI</div>
+  <div class="footer-copy" id="footerCopy">&copy; 2026 WebCraft Agency &nbsp;&middot;&nbsp; Metro Detroit, MI</div>
+<script>
+(function(){
+  var clicks=0,timer;
+  document.getElementById('footerCopy').addEventListener('click',function(){
+    clicks++;
+    clearTimeout(timer);
+    if(clicks>=5){clicks=0;window.location.href='admin/';}
+    timer=setTimeout(function(){clicks=0;},1500);
+  });
+})();
+</script>
 </footer>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
