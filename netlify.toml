@@ -1,5 +1,6 @@
 [build]
   publish = "grand-river-digital-site"
+  functions = "grand-river-digital-site/netlify/functions"
 
 [[redirects]]
   from = "/portal"
