@@ -311,7 +311,7 @@ tr:last-child td{border-bottom:none}
         <div class="clh" id="clh">All Clients</div>
         <div class="clist-scroll" id="clistScroll"></div>
       </div>
-      <div class="cdet" id="cdet"><div class="empty-state"><div class="empty-icon">&#128101;</div><div class="empty-txt">Select a client</div></div></div>
+      <div class="cdet" id="cdet"><div class="empty-state"><div class="empty-icon">&#127881;</div><div class="empty-txt">No clients yet.<br>Your first signup will appear here.</div></div></div>
     </div>
   </div>
 
@@ -406,7 +406,7 @@ tr:last-child td{border-bottom:none}
     </div>
     <div class="card">
       <div class="ch"><div class="ct">All Leads</div></div>
-      <div id="leadsList"><div class="empty-state"><div class="empty-icon">&#127775;</div><div class="empty-txt">No leads yet.<br>Run the Maps Scanner and click "Add Lead".</div></div></div>
+      <div id="leadsList"><div class="empty-state"><div class="empty-icon">&#127775;</div><div class="empty-txt">No leads yet.<br>Use the Maps Scanner to find local businesses without websites.</div></div></div>
     </div>
   </div>
 
@@ -477,20 +477,7 @@ tr:last-child td{border-bottom:none}
 
 <script>
 // ─── SEED CLIENTS ───────────────────────────────────────────────────────────
-const seedClients = [
-  {id:1,name:"Sterling Auto Care",contact:"Mike Caruso",domain:"sterlingautocare.com",email:"mike@sterlingautocare.com",phone:"(586) 421-0012",plan:"Pro",mrr:499,status:"Active",services:"Hosting + Maintenance + SEO",joined:"Jan 15, 2025",next:"Apr 15, 2025",color:"#1a56db",source:"Direct"},
-  {id:2,name:"Detroit Pizza House",contact:"Joe Amato",domain:"detroitpizzahouse.com",email:"joe@detroitpizzahouse.com",phone:"(313) 555-4433",plan:"Growth",mrr:299,status:"Active",services:"Hosting + Maintenance",joined:"Feb 3, 2025",next:"Apr 3, 2025",color:"#15803d",source:"Direct"},
-  {id:3,name:"Great Lakes Dental",contact:"Dr. Karen Smith",domain:"greatlakesdental.com",email:"dr.smith@greatlakes.com",phone:"(248) 900-1122",plan:"Pro",mrr:499,status:"Active",services:"Hosting + Maintenance + SEO",joined:"Nov 10, 2024",next:"Apr 10, 2025",color:"#2563eb",source:"Direct"},
-  {id:4,name:"Metro Cleaning Co",contact:"Linda Osei",domain:"metrocleaningco.com",email:"info@metrocleaning.com",phone:"(734) 667-2210",plan:"Starter",mrr:149,status:"Active",services:"Hosting Only",joined:"Mar 1, 2025",next:"Apr 1, 2025",color:"#0891b2",source:"Direct"},
-  {id:5,name:"Oakland Gym & Fitness",contact:"Todd Reeves",domain:"oaklandgymfit.com",email:"todd@oaklandgym.com",phone:"(248) 441-5500",plan:"Growth",mrr:299,status:"Active",services:"Hosting + Maintenance",joined:"Dec 5, 2024",next:"Apr 5, 2025",color:"#d97706",source:"Direct"},
-  {id:6,name:"Sunrise Realty Group",contact:"Sarah Nguyen",domain:"sunriserealty.com",email:"sarah@sunriserealty.com",phone:"(586) 772-9033",plan:"Enterprise",mrr:799,status:"Active",services:"Full Package + Custom Dev",joined:"Oct 20, 2024",next:"Apr 20, 2025",color:"#9333ea",source:"Direct"},
-  {id:7,name:"Macomb HVAC Pros",contact:"Bill Kowalski",domain:"macomhvacpros.com",email:"bill@macomhvac.com",phone:"(586) 500-3344",plan:"Pro",mrr:499,status:"Active",services:"Hosting + Maintenance + SEO",joined:"Jan 28, 2025",next:"Apr 28, 2025",color:"#06b6d4",source:"Direct"},
-  {id:8,name:"Bella Hair Studio",contact:"Bella Russo",domain:"bellahairstudio.com",email:"bella@bellahair.com",phone:"(248) 334-0099",plan:"Starter",mrr:149,status:"Overdue",services:"Hosting Only",joined:"Feb 14, 2025",next:"Mar 14, 2025",color:"#ec4899",source:"Direct"},
-  {id:9,name:"Eastside Plumbing",contact:"Kevin Marsh",domain:"eastsideplumbing.com",email:"kevin@eastsideplumbing.com",phone:"(313) 228-4411",plan:"Growth",mrr:299,status:"Active",services:"Hosting + Maintenance",joined:"Mar 10, 2025",next:"Apr 10, 2025",color:"#15803d",source:"Direct"},
-  {id:10,name:"Royal Paws Pet Spa",contact:"Amy Chen",domain:"royalpawspetspa.com",email:"amy@royalpaws.com",phone:"(248) 771-6655",plan:"Starter",mrr:149,status:"Active",services:"Hosting Only",joined:"Mar 18, 2025",next:"Apr 18, 2025",color:"#d97706",source:"Direct"},
-  {id:11,name:"Varsity Law Group",contact:"Marcus Grant",domain:"varsitylaw.com",email:"mgrant@varsitylaw.com",phone:"(313) 900-0044",plan:"Pro",mrr:499,status:"Active",services:"Hosting + Maintenance + SEO",joined:"Feb 22, 2025",next:"Apr 22, 2025",color:"#1a56db",source:"Direct"},
-  {id:12,name:"Fresh Market Deli",contact:"Anna Petrov",domain:"freshmarketdeli.com",email:"anna@freshmarket.com",phone:"(586) 112-8833",plan:"Starter",mrr:149,status:"Paused",services:"Hosting Only",joined:"Jan 5, 2025",next:"\u2014",color:"#2563eb",source:"Direct"},
-];
+const seedClients = [];
 
 const avColors=['#1a56db','#15803d','#2563eb','#d97706','#0891b2','#9333ea','#ec4899','#06b6d4'];
 const D = {
@@ -499,45 +486,16 @@ const D = {
   currentOutreachLead: null,
   currentOutreachTab: 'cold',
   prevPage: null,
-  rev8:[3200,3800,4100,4800,5200,6100,6900,8240],mon8:['Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'],
-  rev12:[1200,1800,2400,2900,3200,3800,4100,4800,5200,6100,6900,8240],mon12:['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'],
-  invoices:[
-    {id:'INV-042',client:'Sterling Auto Care',amt:499,status:'Paid',date:'Mar 15, 2025'},
-    {id:'INV-041',client:'Sunrise Realty Group',amt:799,status:'Paid',date:'Mar 20, 2025'},
-    {id:'INV-040',client:'Bella Hair Studio',amt:149,status:'Overdue',date:'Mar 14, 2025'},
-    {id:'INV-039',client:'Great Lakes Dental',amt:499,status:'Paid',date:'Mar 10, 2025'},
-    {id:'INV-038',client:'Metro Cleaning Co',amt:149,status:'Pending',date:'Apr 1, 2025'},
-    {id:'INV-037',client:'Varsity Law Group',amt:499,status:'Pending',date:'Mar 22, 2025'},
-  ],
-  seo:[
-    {c:'Sterling Auto Care',kw:'auto repair Sterling Heights',pos:3,score:88,ch:'+2'},
-    {c:'Great Lakes Dental',kw:'dentist Macomb County',pos:5,score:82,ch:'+5'},
-    {c:'Sunrise Realty Group',kw:'homes for sale Detroit',pos:9,score:79,ch:'+1'},
-    {c:'Macomb HVAC Pros',kw:'HVAC repair Macomb MI',pos:11,score:74,ch:'+4'},
-    {c:'Detroit Pizza House',kw:'Detroit style pizza',pos:14,score:71,ch:'-1'},
-    {c:'Varsity Law Group',kw:'personal injury lawyer Detroit',pos:18,score:68,ch:'+3'},
-  ],
+  rev8:[0,0,0,0,0,0,0,0],mon8:['Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'],
+  rev12:[0,0,0,0,0,0,0,0,0,0,0,0],mon12:['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'],
+  invoices:[],
+  seo:[],
   scanLeads:[
     {n:"Big Mama's Soul Food",t:"Restaurant",a:"Utica, MI",r:"4.6",rv:89,ph:"(586) 441-8822"},
     {n:"Keller's Auto Glass",t:"Auto Services",a:"Sterling Heights, MI",r:"4.4",rv:156,ph:"(586) 773-0044"},
     {n:"Sunrise Nail Bar",t:"Beauty",a:"Shelby Township, MI",r:"4.8",rv:212,ph:"(586) 900-1133"},
     {n:"Champion Concrete",t:"Contractor",a:"Roseville, MI",r:"4.3",rv:44,ph:"(586) 228-7700"},
-    {n:"Royal Garden Florist",t:"Retail",a:"Clinton Township, MI",r:"4.9",rv:178,ph:"(586) 443-9900"},
-    {n:"Precise Plumbing",t:"Plumbing",a:"Warren, MI",r:"4.7",rv:63,ph:"(586) 331-2200"},
-    {n:"The Dog Spot",t:"Pet Services",a:"Sterling Heights, MI",r:"4.9",rv:341,ph:"(586) 771-5566"},
-    {n:"Prime Cuts Barbershop",t:"Beauty",a:"Macomb, MI",r:"4.7",rv:95,ph:"(586) 225-0011"},
-    {n:"Macomb Tire & Wheels",t:"Auto Services",a:"Macomb, MI",r:"4.5",rv:127,ph:"(586) 556-8833"},
-    {n:"Metro Moving Services",t:"Services",a:"Warren, MI",r:"4.6",rv:58,ph:"(586) 441-3300"},
-    {n:"Elite Roofing LLC",t:"Contractor",a:"Utica, MI",r:"4.4",rv:39,ph:"(586) 900-7722"},
-    {n:"Baklava Palace Bakery",t:"Restaurant",a:"Sterling Heights, MI",r:"4.8",rv:203,ph:"(586) 558-4411"},
-    {n:"Eastside Tax Services",t:"Financial",a:"Clinton Township, MI",r:"4.3",rv:29,ph:"(586) 114-8800"},
-    {n:"Quick Dry Cleaners",t:"Services",a:"Roseville, MI",r:"4.5",rv:71,ph:"(586) 229-6600"},
-    {n:"Bloom & Blossom Spa",t:"Beauty",a:"Shelby Township, MI",r:"4.7",rv:189,ph:"(586) 772-4455"},
-    {n:"Oakland Pest Control",t:"Services",a:"Sterling Heights, MI",r:"4.6",rv:47,ph:"(586) 661-3311"},
-    {n:"Macomb Furniture",t:"Retail",a:"Macomb, MI",r:"4.4",rv:82,ph:"(586) 330-0099"},
-    {n:"Riverdale Landscaping",t:"Contractor",a:"Warren, MI",r:"4.5",rv:55,ph:"(586) 221-8833"},
-    {n:"Champ's Sports Bar",t:"Restaurant",a:"Clinton Township, MI",r:"4.2",rv:144,ph:"(586) 441-7700"},
-    {n:"TrueSmile Orthodontics",t:"Medical",a:"Sterling Heights, MI",r:"4.9",rv:267,ph:"(586) 551-3300"},
+    {n:"Royal Garden Florist",t:"Retail",a:"Clinton Township, MI",r:"4.9",rv:178,ph:"(586) 443-9900"}
   ]
 };
 
@@ -763,7 +721,7 @@ function renderLeadsPage(){
   document.getElementById('lsContacted').textContent=contacted;
   document.getElementById('lsConverted').textContent=converted;
   const container=document.getElementById('leadsList');if(!container)return;
-  if(total===0){container.innerHTML=`<div class="empty-state"><div class="empty-icon">&#127775;</div><div class="empty-txt">No leads yet.<br>Run the Maps Scanner and click "Add Lead".</div></div>`;return;}
+  if(total===0){container.innerHTML=`<div class="empty-state"><div class="empty-icon">&#127775;</div><div class="empty-txt">No leads yet.<br>Use the Maps Scanner to find local businesses without websites.</div></div>`;return;}
   container.innerHTML=D.leads.map((l,i)=>`
     <div class="lead-row">
       <div class="lead-info">
