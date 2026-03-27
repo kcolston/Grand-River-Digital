@@ -122,7 +122,8 @@ async function doLogin() {
       // Normal login — set session and go
       sessionStorage.setItem('grd_admin', hash);
       sessionStorage.setItem('grd_owner_email', creds.email);
-      window.location.href = 'dashboard.html';
+      // Brief delay ensures sessionStorage is committed before navigation
+      setTimeout(function(){ window.location.href = 'dashboard.html'; }, 50);
     }
   } else {
     showErr('err', 'Incorrect email or password &mdash; try again.');
@@ -142,7 +143,7 @@ async function saveNewCreds() {
   saveCreds(email.toLowerCase(), hash);
   sessionStorage.setItem('grd_admin', hash);
   sessionStorage.setItem('grd_owner_email', email.toLowerCase());
-  window.location.href = 'dashboard.html';
+  setTimeout(function(){ window.location.href = 'dashboard.html'; }, 50);
 }
 
 function showErr(id, msg) {
@@ -153,10 +154,15 @@ function showErr(id, msg) {
 }
 
 // Skip gate if already authenticated this session
-(async () => {
-  const creds   = getCreds();
-  const stored  = sessionStorage.getItem('grd_admin');
-  if (stored && stored === creds.hash && !creds.isDefault) {
+(function(){
+  var DEFAULT = '18bbbec8bd46ee18b107b185aaea73ef6e0c8e7db524f821d1b3c96d51c8a03a';
+  var stored  = sessionStorage.getItem('grd_admin');
+  var creds;
+  try { creds = JSON.parse(localStorage.getItem('grd_owner_creds') || '{}'); } catch(e) { creds = {}; }
+  var validHash = (creds && creds.hash) ? creds.hash : DEFAULT;
+  var isDefault = !creds.hash; // no saved creds = still on default
+  // Only auto-forward if authenticated AND not on default creds (force change)
+  if (stored && stored === validHash && !isDefault) {
     window.location.href = 'dashboard.html';
   }
 })();

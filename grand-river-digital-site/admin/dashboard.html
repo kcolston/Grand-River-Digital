@@ -164,51 +164,18 @@ tr:last-child td{border-bottom:none}
 .empty-icon{font-size:26px;margin-bottom:8px}
 .empty-txt{font-size:11.5px;line-height:1.6}
 
-/* NEW SIGNUPS BANNER */
-.new-banner{background:rgba(21,128,61,.08);border:0.5px solid rgba(21,128,61,.25);border-radius:var(--border-radius-md);padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.new-banner-text{font-size:12px;color:var(--green);font-weight:500}
-.new-banner-sub{font-size:11px;color:var(--muted);margin-top:1px}
-.new-badge{background:var(--green);color:#fff;font-size:9px;padding:2px 7px;border-radius:99px;font-weight:600;margin-left:6px}
-
-/* SOURCE TAG */
-.source-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;background:rgba(21,128,61,.08);color:var(--green);border:0.5px solid rgba(21,128,61,.2);border-radius:4px;padding:1px 6px}
-
-.moverlay{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:50}
-.moverlay.on{display:flex}
-.modal{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--border-radius-lg);padding:20px;width:400px;max-width:90%}
-.mttl{font-size:14px;font-weight:500;margin-bottom:3px}
-.msub{font-size:11px;color:var(--muted);margin-bottom:16px}
-.mform{display:flex;flex-direction:column;gap:10px}
-.fg{display:flex;flex-direction:column;gap:4px}
-.flbl{font-size:10px;color:var(--muted);font-weight:500}
-.fi{background:var(--surface2);border:0.5px solid var(--border2);color:var(--text);padding:7px 9px;border-radius:6px;font-size:11.5px;font-family:var(--font-sans);outline:none;width:100%}
-.fi:focus{border-color:var(--accent)}
-.mact{display:flex;justify-content:flex-end;gap:7px;margin-top:14px}
-.g2f{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.toast{position:fixed;bottom:20px;right:20px;background:var(--text);color:var(--surface);padding:7px 14px;border-radius:6px;font-size:11px;font-weight:500;z-index:99;opacity:0;transition:opacity .25s;pointer-events:none}
-.toast.on{opacity:1}
-
-.cb-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:10px}
-.cb-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
-.cb-info{flex:1}
-.cb-name{font-size:13px;font-weight:500}
-.cb-biz{font-size:11px;color:var(--muted);margin-top:1px}
-.cb-time{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:12px}
-.cb-status{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:500}
-.cb-pending{background:rgba(217,119,6,.1);color:var(--amber)}
-.cb-confirmed{background:rgba(21,128,61,.1);color:var(--green)}
-.cb-declined{background:rgba(220,38,38,.08);color:var(--red)}
-.cb-actions{display:flex;gap:7px;flex-wrap:wrap}
-.billing-note{font-size:10.5px;background:rgba(217,119,6,.07);border:0.5px solid rgba(217,119,6,.2);border-radius:5px;padding:5px 9px;color:var(--amber);margin-top:6px}
-</style>
-</head>
-<body>
-<script>
-/* Grand River Digital — Admin Auth Guard */
-(async function(){
-  const H='18bbbec8bd46ee18b107b185aaea73ef6e0c8e7db524f821d1b3c96d51c8a03a';
-  const s=sessionStorage.getItem('grd_admin');
-  if(!s||s!==H){window.location.replace('index.html');}
+/* WebCraft Admin Auth Guard */
+(function(){
+  // Read the current valid hash from localStorage (set during login)
+  // Falls back to the default hash if no custom creds have been saved yet
+  var DEFAULT = '18bbbec8bd46ee18b107b185aaea73ef6e0c8e7db524f821d1b3c96d51c8a03a';
+  var stored  = sessionStorage.getItem('grd_admin');
+  var creds;
+  try { creds = JSON.parse(localStorage.getItem('grd_owner_creds') || '{}'); } catch(e) { creds = {}; }
+  var validHash = (creds && creds.hash) ? creds.hash : DEFAULT;
+  if (!stored || stored !== validHash) {
+    window.location.replace('index.html');
+  }
 })();
 </script>
 <div class="shell">
