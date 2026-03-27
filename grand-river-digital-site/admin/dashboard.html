@@ -208,7 +208,7 @@ tr:last-child td{border-bottom:none}
 (async function(){
   const H='18bbbec8bd46ee18b107b185aaea73ef6e0c8e7db524f821d1b3c96d51c8a03a';
   const s=sessionStorage.getItem('grd_admin');
-  if(!s||s!==H){window.location.replace('/admin/');}
+  if(!s||s!==H){window.location.replace('index.html');}
 })();
 </script>
 <div class="shell">
@@ -239,7 +239,7 @@ tr:last-child td{border-bottom:none}
   <div class="topbar">
     <button class="back-btn" id="backBtn" onclick="goBack()">&#8592; Back</button>
     <div class="tb-title" id="ttl">Dashboard</div>
-    <a href="/index.html" style="font-size:11px;color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;border:0.5px solid var(--border2);margin-right:4px">&#8592; Site</a>
+    <a href="../index.html" style="font-size:11px;color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;border:0.5px solid var(--border2);margin-right:4px">&#8592; Site</a>
     <button onclick="sessionStorage.removeItem('grd_admin');window.location.href='/admin/';" style="font-size:11px;color:var(--muted);background:none;border:0.5px solid var(--border2);border-radius:5px;padding:4px 9px;cursor:pointer;font-family:var(--font-sans);margin-right:8px">Log out</button>
     <div class="tb-live"><span class="live-dot"></span>All systems live</div>
     <button class="btn primary sm" onclick="openModal()">+ Add Client</button>
