@@ -373,7 +373,7 @@ tr:last-child td{border-bottom:none}
         <div class="sfg" style="max-width:88px"><label class="slbl">Results</label>
           <select class="ssel" id="scLim"><option>10</option><option selected>20</option><option>50</option></select>
         </div>
-        <button class="btn primary" id="scanBtn" onclick="startScan()" style="align-self:flex-end;padding:7px 16px">&#128269; Scan Now</button>
+        <button class="btn primary" id="scanBtn" onclick="startScan()" style="align-self:flex-end;padding:7px 16px">🔍 Scan Now</button>
       </div>
       <div id="scanProg" style="display:none">
         <div class="prog-track"><div class="prog-fill" id="pbar"></div></div>
@@ -546,6 +546,7 @@ const D = {
   currentScanLead: null,
   currentOutreachLead: null,
   currentOutreachTab: 'cold',
+  scanResults: [],
   prevPage: null,
   rev8:[0,0,0,0,0,0,0,0],mon8:['Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'],
   rev12:[0,0,0,0,0,0,0,0,0,0,0,0],mon12:['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'],
@@ -866,52 +867,115 @@ function addCurrentLeadFromOutreach(){
 }
 
 function startScan(){
-  const btn=document.getElementById('scanBtn'),prog=document.getElementById('scanProg'),bar=document.getElementById('pbar'),stat=document.getElementById('sstat');
-  const city=document.getElementById('scCity').value||'your area';
-  const lim=parseInt(document.getElementById('scLim').value);
-  D.currentScanLead=null;btn.disabled=true;btn.textContent='Scanning...';
-  prog.style.display='block';document.getElementById('scanResultsBox').style.display='none';
+  const btn  = document.getElementById('scanBtn');
+  const prog = document.getElementById('scanProg');
+  const bar  = document.getElementById('pbar');
+  const stat = document.getElementById('sstat');
+  const city = document.getElementById('scCity').value || 'Sterling Heights, MI';
+  const type = document.getElementById('scType').value;
+  const rad  = parseInt(document.getElementById('scRad').value) * 1609;
+  const lim  = parseInt(document.getElementById('scLim').value);
+
+  D.currentScanLead = null;
+  btn.disabled = true;
+  btn.textContent = 'Scanning...';
+  prog.style.display = 'block';
+  document.getElementById('scanResultsBox').style.display = 'none';
   document.getElementById('outreachFooter').classList.add('faded');
-  const steps=[[12,`Connecting to Google Maps for ${city}...`],[28,'Querying business listings...'],[46,'Checking each listing for a website...'],[63,'Filtering results...'],[80,'Scoring by reviews and rating...'],[94,'Building your lead report...'],[100,'Done!']];
-  let i=0;
-  function step(){if(i>=steps.length){setTimeout(()=>{btn.disabled=false;btn.textContent='&#128269; Scan Now';prog.style.display='none';bar.style.width='0%';stat.textContent='';renderScanResults(lim);},400);return;}bar.style.width=steps[i][0]+'%';stat.textContent=steps[i][1];i++;setTimeout(step,500+Math.random()*250);}
-  step();
+
+  const steps = [
+    [15, 'Connecting to Google Maps\u2026'],
+    [35, 'Searching ' + city + '\u2026'],
+    [55, 'Checking listings for websites\u2026'],
+    [75, 'Filtering results\u2026'],
+    [90, 'Almost done\u2026'],
+  ];
+  let si = 0;
+  const ticker = setInterval(() => {
+    if(si < steps.length){ bar.style.width = steps[si][0]+'%'; stat.textContent = steps[si][1]; si++; }
+  }, 700);
+
+  const params = new URLSearchParams({ city, type, radius: rad, limit: lim });
+  fetch('/.netlify/functions/scanner?' + params.toString())
+    .then(r => r.json())
+    .then(data => {
+      clearInterval(ticker);
+      bar.style.width = '100%';
+      stat.textContent = 'Done!';
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.textContent = '\uD83D\uDD0D Scan Now';
+        prog.style.display = 'none';
+        bar.style.width = '0%';
+        if(data.error){ alert('Scanner error: ' + data.error); return; }
+        D.scanResults = data.leads || [];
+        renderScanResults(data);
+      }, 400);
+    })
+    .catch(err => {
+      clearInterval(ticker);
+      btn.disabled = false;
+      btn.textContent = '\uD83D\uDD0D Scan Now';
+      prog.style.display = 'none';
+      bar.style.width = '0%';
+      stat.textContent = '';
+      alert('Scanner could not connect.\n\nMake sure:\n1. netlify.toml is at your repo root\n2. GOOGLE_PLACES_KEY is set in Netlify environment variables\n3. The site has been redeployed after adding both\n\nError: ' + err.message);
+    });
 }
 
-function renderScanResults(lim){
-  const leads=D.scanLeads.slice(0,lim);
-  document.getElementById('leadCount').textContent=leads.length;
-  document.getElementById('rgrid').innerHTML=leads.map((l,i)=>`
+function renderScanResults(data){
+  const leads = data.leads || [];
+  document.getElementById('leadCount').textContent = leads.length;
+  document.getElementById('scanResultsBox').style.display = 'block';
+
+  if(leads.length === 0){
+    document.getElementById('rgrid').innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--muted)">
+        <div style="font-size:22px;margin-bottom:8px">\uD83D\uDD0D</div>
+        <div style="font-size:13px">No businesses without websites found.<br>Try a different city, type, or larger radius.</div>
+      </div>`;
+    return;
+  }
+
+  document.getElementById('rgrid').innerHTML = leads.map((l,i) => `
     <div class="rcard" id="rc${i}" onclick="selectScanLead(${i},this)">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px">
-        <div style="min-width:0;flex:1;margin-right:6px"><div class="rbiz">${l.n}</div><div class="rtype">${l.t} &middot; ${l.a}</div></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+        <div style="min-width:0;flex:1;margin-right:6px">
+          <div class="rbiz">${l.name}</div>
+          <div class="rtype">${l.type} &middot; ${l.address}</div>
+        </div>
         <span class="badge bg" style="flex-shrink:0">No website</span>
       </div>
-      <div class="rmeta"><span class="rt g">${l.r}&#9733;</span><span class="rt">${l.rv} reviews</span><span class="rt">${l.ph}</span></div>
-      <div class="ract">
+      <div class="rmeta">
+        ${l.rating !== 'N/A' ? `<span class="rt g">${l.rating}&#9733;</span>` : ''}
+        ${l.reviews > 0 ? `<span class="rt">${l.reviews} reviews</span>` : ''}
+        ${l.phone !== 'Not listed' ? `<span class="rt">${l.phone}</span>` : ''}
+      </div>
+      <div class="ract" style="margin-top:8px">
         <button class="btn success sm" onclick="event.stopPropagation();addLeadDirect(${i})">+ Add Lead</button>
         <button class="btn sm" onclick="event.stopPropagation();quickCopy(${i})">&#9993; Copy Email</button>
+        ${l.phone !== 'Not listed' ? `<a href="tel:${l.phone}" class="btn sm" onclick="event.stopPropagation()" style="text-decoration:none">&#128222; Call</a>` : ''}
       </div>
     </div>`).join('');
-  document.getElementById('scanResultsBox').style.display='block';
 }
+
 
 function selectScanLead(i,el){
   document.querySelectorAll('.rcard').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');
-  D.currentScanLead=D.scanLeads[i];
+  D.currentScanLead=(D.scanResults||D.scanLeads||[])[i];
   const footer=document.getElementById('outreachFooter');footer.classList.remove('faded');
   document.getElementById('ofSelName').textContent=D.currentScanLead.n+' — '+D.currentScanLead.t;
 }
 
 function addLeadDirect(i){
-  const l=D.scanLeads[i];
+  const l=(D.scanResults||D.scanLeads||[])[i];
   if(D.leads.find(x=>x.name===l.n)){toast(l.n+' already in leads');return;}
   D.leads.push({name:l.n,type:l.t,address:l.a,phone:l.ph,rating:l.r,reviews:l.rv,status:'New'});
   updateLeadBadge();renderOv();toast(l.n+' added to Leads');
 }
 
 function quickCopy(i){
-  const l=D.scanLeads[i];
+  const l=(D.scanResults||D.scanLeads||[])[i];
   navigator.clipboard.writeText(genEmail({name:l.n,type:l.t,address:l.a,rating:l.r,reviews:l.rv},'cold')).catch(()=>{});
   toast('Email copied!');
 }
