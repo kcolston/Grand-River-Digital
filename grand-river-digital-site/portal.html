@@ -343,12 +343,12 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 <!-- LOGIN -->
 <div class="login-wrap" id="loginWrap">
   <div class="login-card">
-    <div class="login-logo">GRAND RIVER <span class="login-logo-badge">GRD CLIENT PORTAL</span></div>
+    <div class="login-logo">GRAND RIVER DIGITAL <span class="login-logo-badge">CLIENT PORTAL</span></div>
     <div class="login-title">Welcome back</div>
     <div class="login-sub">Sign in to view your Grand River Digital website performance, invoices, and more.</div>
     <div class="field">
       <label>Email address</label>
-      <input type="email" id="loginEmail" placeholder="you@yourbusiness.com" value="mike@sterlingautocare.com">
+      <input type="email" id="loginEmail" placeholder="you@yourbusiness.com" value="kevin@grandriverdigital.com">
     </div>
     <div class="field">
       <label>Password</label>
@@ -357,8 +357,8 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
     <div class="login-error" id="loginError">Invalid email or password. Try the demo login.</div>
     <button class="login-btn" onclick="doLogin()">Sign in →</button>
     <div class="login-demo">
-      <span style="color:var(--muted)">Try the demo — </span>
-      <button onclick="demoLogin()">click to auto-fill &amp; login</button>
+      <span style="color:var(--muted)">Demo login — </span>
+      <button onclick="demoLogin()">click to preview portal</button>
     </div>
   </div>
 </div>
@@ -516,6 +516,26 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 const clients = {
+  'kevin@grandriverdigital.com': {
+    name:'Kevin Colston', biz:'Demo Client — Grand River Digital', domain:'demo.grandriverdigital.com',
+    plan:'Pro', mrr:499, color:'#1a56db',
+    visitors:412, visitorsDelta:'↑ 22% vs last month',
+    ranking:'#4', rankingDelta:'↑ 3 positions', rankingColor:'var(--green)',
+    seo:[
+      {kw:'web design sterling heights',pos:4,score:85,ch:'+3'},
+      {kw:'website design macomb county',pos:7,score:78,ch:'+5'},
+      {kw:'local web agency metro detroit',pos:12,score:71,ch:'+2'},
+    ],
+    invoices:[
+      {id:'INV-001',desc:'Pro Plan – March 2026',amt:499,status:'Paid',date:'Mar 1, 2026'},
+      {id:'INV-002',desc:'Pro Plan – Feb 2026',amt:499,status:'Paid',date:'Feb 1, 2026'},
+    ],
+    uptime: 99.97,
+    manager:'Kevin · hello@grandriverdigital.com',
+    managerPhone:'(586) 000-0000',
+    nextBilling:'Apr 1, 2026',
+    siteStatus:'Live',
+  },
   'mike@sterlingautocare.com': {
     name:'Mike Caruso', biz:'Sterling Auto Care', domain:'sterlingautocare.com',
     plan:'Pro', mrr:499, color:'#1a56db',
@@ -579,8 +599,8 @@ function doLogin() {
   loadPortal(client);
 }
 
-function demoLogin() {
-  document.getElementById('loginEmail').value = 'mike@sterlingautocare.com';
+function demoLogin() /* Kevin demo */ {
+  document.getElementById('loginEmail').value = 'kevin@grandriverdigital.com';
   document.getElementById('loginPass').value = 'password';
   doLogin();
 }
