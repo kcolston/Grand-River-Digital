@@ -348,11 +348,11 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
     <div class="login-sub">Sign in to view your Grand River Digital website performance, invoices, and more.</div>
     <div class="field">
       <label>Email address</label>
-      <input type="email" id="loginEmail" placeholder="you@yourbusiness.com" value="kevin@grandriverdigital.com">
+      <input type="email" id="loginEmail" placeholder="you@yourbusiness.com">
     </div>
     <div class="field">
       <label>Password</label>
-      <input type="password" id="loginPass" placeholder="••••••••" value="password">
+      <input type="password" id="loginPass" placeholder="••••••••">
     </div>
     <div class="login-error" id="loginError">Invalid email or password. Try the demo login.</div>
     <button class="login-btn" onclick="doLogin()">Sign in →</button>
@@ -502,7 +502,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
             </div>
             <div style="display:flex;gap:8px;flex-wrap:wrap">
               <a href="tel:+15860000000" style="text-decoration:none"><button class="btn-sm" style="border-color:#1a56db;color:#1a56db">📞 Call us</button></a>
-              <a href="/cdn-cgi/l/email-protection#fc9499909093bc8b999e9f8e9d9a88d29d9b99929f85" style="text-decoration:none"><button class="btn-sm">✉ Email us</button></a>
+              <a href="mailto:hello@grandriverdigital.com"><button class="btn-sm">&#9993; Email us</button></a>
             </div>
           </div>
         </div>
@@ -514,7 +514,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
 <div class="toast" id="toast"></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 const clients = {
   'kevin@grandriverdigital.com': {
     name:'Kevin Colston', biz:'Demo Client — Grand River Digital', domain:'demo.grandriverdigital.com',
@@ -586,23 +586,41 @@ const clients = {
 let currentClient = null;
 
 function doLogin() {
-  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-  const pass = document.getElementById('loginPass').value;
-  const err = document.getElementById('loginError');
-  const client = clients[email];
-  if (!client || pass.length < 1) {
-    err.style.display = 'block';
+  var emailEl = document.getElementById('loginEmail');
+  var passEl  = document.getElementById('loginPass');
+  var errEl   = document.getElementById('loginError');
+  if (!emailEl || !passEl) { console.error('Login fields missing'); return; }
+  var email  = emailEl.value.trim().toLowerCase();
+  var pass   = passEl.value;
+  var client = clients[email];
+  if (!client) {
+    errEl.style.display = 'block';
+    errEl.textContent   = 'Email not found. Try the demo login below.';
     return;
   }
-  err.style.display = 'none';
+  if (pass.length < 1) {
+    errEl.style.display = 'block';
+    errEl.textContent   = 'Please enter a password (any password works for demo).';
+    return;
+  }
+  errEl.style.display = 'none';
   currentClient = client;
-  loadPortal(client);
+  try {
+    loadPortal(client);
+  } catch(e) {
+    console.error('loadPortal error:', e);
+    errEl.style.display = 'block';
+    errEl.textContent   = 'Error loading portal: ' + e.message;
+  }
 }
 
-function demoLogin() /* Kevin demo */ {
-  document.getElementById('loginEmail').value = 'kevin@grandriverdigital.com';
-  document.getElementById('loginPass').value = 'password';
-  doLogin();
+function demoLogin() {
+  var em = document.getElementById('loginEmail');
+  var pw = document.getElementById('loginPass');
+  if (!em || !pw) { alert('Login fields not found - please refresh'); return; }
+  em.value = 'kevin@grandriverdigital.com';
+  pw.value = 'demo123';
+  setTimeout(function() { doLogin(); }, 50);
 }
 
 function logout() {
